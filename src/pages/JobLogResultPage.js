@@ -24,13 +24,13 @@ import {
 } from '@mui/material';
 // components
 import Label from '../components/label';
-import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
+import Dialog from '../components/dialog';
 // sections
 import { JobLogListHead, JobLogListToolbar } from '../sections/@dashboard/joblog';
 // mock
 import JOBLOGLIST from '../_mock/joblog';
-
+import LOGDETAILS from '../_mock/logdetails';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
@@ -73,7 +73,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function UserPage() {
+export default function JobLogPage() {
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -88,9 +88,12 @@ export default function UserPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
-  const handleCloseMenu = () => {
-    setOpen(null);
+  const handleClose = () => {
+    setOpen(false);
   };
 
   const handleRequestSort = (event, property) => {
@@ -196,11 +199,12 @@ export default function UserPage() {
                         <TableCell align="left">{status}</TableCell>
 
                         <TableCell align="left">
-                          <Link href = "/" variant="subtitle2" underline="hover">
-                            <IconButton size="large" color="inherit">
-                              <Iconify icon={'fluent:open-16-filled'} />
-                            </IconButton>
-                          </Link>
+                              <Dialog
+                                open={open}
+                                onClose={handleClose}
+                                data={LOGDETAILS}
+                                type={'log'}
+                              />
                         </TableCell>
 
                       </TableRow>
@@ -252,35 +256,6 @@ export default function UserPage() {
           />
         </Card>
       </Container>
-
-      <Popover
-        open={Boolean(open)}
-        anchorEl={open}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75,
-            },
-          },
-        }}
-      >
-        <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
-      </Popover>
     </>
   );
 }
