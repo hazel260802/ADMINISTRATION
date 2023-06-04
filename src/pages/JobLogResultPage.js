@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
-import { Link as RouterLink } from 'react-router-dom';
 import { useState } from 'react';
 // @mui
 import {
@@ -28,19 +27,19 @@ import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
+import { JobLogListHead, JobLogListToolbar } from '../sections/@dashboard/joblog';
 // mock
-import USERLIST from '../_mock/user';
+import JOBLOGLIST from '../_mock/joblog';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
-  { id: 'name', label: 'Name', alignRight: false },
   { id: 'studentId', label: 'StudentId', alignRight: false },
-  { id: 'school', label: 'School', alignRight: false },
-  { id: 'studentDetails', label: 'Student Details', alignRight: false },
-  { id: 'grade', label: 'Grade', alignRight: false },
+  { id: 'method', label: 'Method', alignRight: false },
+  { id: 'url', label: 'URL', alignRight: false },
+  { id: 'status', label: 'Status', alignRight: false },
+  { id: 'details', label: 'Details', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -102,7 +101,7 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = JOBLOGLIST.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -138,73 +137,66 @@ export default function UserPage() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - JOBLOGLIST.length) : 0;
 
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
+  const filteredJobLog = applySortFilter(JOBLOGLIST, getComparator(order, orderBy), filterName);
 
-  const isNotFound = !filteredUsers.length && !!filterName;
+  const isNotFound = !filteredJobLog.length && !!filterName;
 
   return (
     <>
       <Helmet>
-        <title> User </title>
+        <title> Job Log Result </title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            User
+            Job Log Result
           </Typography>
         </Stack>
 
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <JobLogListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
-                <UserListHead
+                <JobLogListHead
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={JOBLOGLIST.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, name, studentId, school } = row;
-                    const selectedUser = selected.indexOf(name) !== -1;
+                  {filteredJobLog.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    const { no, studentId, method, url, status} = row;
+                    const selectedJobLog = selected.indexOf(studentId) !== -1;
 
                     return (
-                      <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                      <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedJobLog}>
 
                         <TableCell align="left">{no}</TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2}>
+                          <Stack direction="row" alignItems="center" marginLeft={2} spacing={2}>
                             <Typography variant="subtitle2" noWrap>
-                              {name}
+                              {studentId}
                             </Typography>
                           </Stack>
                         </TableCell>
 
-                        <TableCell align="left">{studentId}</TableCell>
+                        <TableCell align="left">{method}</TableCell>
 
-                        <TableCell align="left">{school}</TableCell>
+                        <TableCell align="left">{url}</TableCell>
 
+                        <TableCell align="left">{status}</TableCell>
 
-                        <TableCell align="center">
-                          <Link component={RouterLink} to="/" variant="subtitle2" underline="hover">
-                            <IconButton size="large" color="inherit">
-                              <Iconify icon={'fluent:open-16-filled'} />
-                            </IconButton>
-                          </Link>
-                        </TableCell>
-
-                        <TableCell align="center">
-                          <Link component={RouterLink} to="/" variant="subtitle2" underline="hover">
+                        <TableCell align="left">
+                          <Link href = "/" variant="subtitle2" underline="hover">
                             <IconButton size="large" color="inherit">
                               <Iconify icon={'fluent:open-16-filled'} />
                             </IconButton>
@@ -252,7 +244,7 @@ export default function UserPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={USERLIST.length}
+            count={JOBLOGLIST.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

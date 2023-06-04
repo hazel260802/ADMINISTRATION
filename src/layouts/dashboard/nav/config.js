@@ -12,9 +12,24 @@ const navConfig = [
     icon: icon('ic_analytics'),
   },
   {
+    title: 'timetable',
+    path: '/dashboard/timetable',
+    icon: icon('ic_timetable'),
+  },
+  {
     title: 'user',
     path: '/dashboard/user',
     icon: icon('ic_user'),
+  },
+  {
+    title: 'job log result',
+    path: '/dashboard/joblog',
+    icon: icon('ic_joblog'),
+  },
+  {
+    title: 'request log result',
+    path: '/dashboard/requestlog',
+    icon: icon('ic_requestlog'),
   },
   {
     title: 'product',

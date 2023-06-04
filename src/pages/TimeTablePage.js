@@ -27,19 +27,17 @@ import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
-import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
+import { TimeTableListHead, TimeTableListToolbar } from '../sections/@dashboard/timetable';
 // mock
-import USERLIST from '../_mock/user';
+import TIMETABLELIST from '../_mock/timetable';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
-  { id: 'name', label: 'Name', alignRight: false },
   { id: 'studentId', label: 'StudentId', alignRight: false },
-  { id: 'school', label: 'School', alignRight: false },
-  { id: 'studentDetails', label: 'Student Details', alignRight: false },
-  { id: 'grade', label: 'Grade', alignRight: false },
+  { id: 'termId', label: 'TermId', alignRight: false },
+  { id: 'jobDetails', label: 'Job Details', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -101,7 +99,7 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = TIMETABLELIST.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -137,72 +135,61 @@ export default function UserPage() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - TIMETABLELIST.length) : 0;
 
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
+  const filteredTimeTable = applySortFilter(TIMETABLELIST, getComparator(order, orderBy), filterName);
 
-  const isNotFound = !filteredUsers.length && !!filterName;
+  const isNotFound = !filteredTimeTable.length && !!filterName;
 
   return (
     <>
       <Helmet>
-        <title> User </title>
+        <title> TimeTable </title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            User
+            TimeTable
           </Typography>
         </Stack>
 
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <TimeTableListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
-                <UserListHead
+                <TimeTableListHead
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={TIMETABLELIST.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, name, studentId, school } = row;
-                    const selectedUser = selected.indexOf(name) !== -1;
+                  {filteredTimeTable.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    const { no, studentId, termId} = row;
+                    const selectedTimeTable = selected.indexOf(studentId) !== -1;
 
                     return (
-                      <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                      <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedTimeTable}>
 
                         <TableCell align="left">{no}</TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2}>
+                          <Stack direction="row" alignItems="center" marginLeft={2} spacing={2}>
                             <Typography variant="subtitle2" noWrap>
-                              {name}
+                              {studentId}
                             </Typography>
                           </Stack>
                         </TableCell>
 
-                        <TableCell align="left">{studentId}</TableCell>
+                        <TableCell align="left">{termId}</TableCell>
 
-                        <TableCell align="left">{school}</TableCell>
-
-
-                        <TableCell align="center">
-                          <Link href = "/" variant="subtitle2" underline="hover">
-                            <IconButton size="large" color="inherit">
-                              <Iconify icon={'fluent:open-16-filled'} />
-                            </IconButton>
-                          </Link>
-                        </TableCell>
-
-                        <TableCell align="center">
+                        <TableCell align="left">
                           <Link href = "/" variant="subtitle2" underline="hover">
                             <IconButton size="large" color="inherit">
                               <Iconify icon={'fluent:open-16-filled'} />
@@ -251,7 +238,7 @@ export default function UserPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={USERLIST.length}
+            count={TIMETABLELIST.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
