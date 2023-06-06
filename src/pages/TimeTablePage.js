@@ -7,23 +7,18 @@ import {
   Table,
   Stack,
   Paper,
-  Avatar,
   Button,
-  Popover,
-  Checkbox,
   TableRow,
-  MenuItem,
   TableBody,
   TableCell,
   Container,
   Typography,
-  IconButton,
   TableContainer,
   TablePagination,
-  Link
 } from '@mui/material';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 // components
-import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 import Dialog from '../components/dialog';
@@ -88,6 +83,8 @@ export default function UserPage() {
   const [filterName, setFilterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [quantity, setQuantity] = useState(10);  
 
 
   const handleClickOpen = () => {
@@ -159,6 +156,9 @@ export default function UserPage() {
           <Typography variant="h4" gutterBottom>
             TimeTable
           </Typography>
+          <Button variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
+            Settings
+          </Button>
         </Stack>
 
         <Card>
@@ -253,6 +253,12 @@ export default function UserPage() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
+
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: '20px'}}>
+          <Button variant="contained" size="large" color = "primary" startIcon={<SummarizeIcon />}>
+            Quantity: {quantity}
+          </Button>
+        </div>
       </Container>
     </>
   );

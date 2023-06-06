@@ -3,11 +3,11 @@ import { sample } from 'lodash';
 
 // ----------------------------------------------------------------------
 
-const users = [...Array(24)].map((_, index) => ({
+const users = [...Array(1)].map((_, index) => ({
   no: index + 1,
+  avatar: faker.image.avatar(),
   name: faker.name.fullName(),
   studentId: faker.datatype.uuid(),
-  cohort: faker.datatype.number(),
   school: faker.company.name(),
 }));
 

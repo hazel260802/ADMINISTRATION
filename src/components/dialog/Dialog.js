@@ -11,6 +11,7 @@ import {
   ListItem,
   ListItemText,
   Typography,
+  Grid
 } from '@mui/material';
 // components
 import Iconify from '../iconify';
@@ -91,7 +92,7 @@ export default function ScrollDialog({data = [], type}) {
                 )}
               </DialogContent>
             </>
-          ) : (
+          ) : type === 'job' ? (
             <>
               <DialogTitle id="scroll-dialog-title">Job Details</DialogTitle>
               <DialogContent dividers>
@@ -151,6 +152,39 @@ export default function ScrollDialog({data = [], type}) {
                 )}
               </DialogContent>
             </>
+          ): type === 'student data' ? (
+            <>
+            <DialogTitle id="scroll-dialog-title">Student Information</DialogTitle>
+            <DialogContent dividers>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6} lg={4}>
+                  {data.map((studentData) => (
+                    <img src={studentData.avatar} alt="Student Avatar" />
+                  ))}
+                </Grid>
+                <Grid item xs={12} md={6} lg={8}>
+                  {data.map((studentData) => (
+                    <div className="info-item">
+                      <Typography component="div" variant="body2">
+                        Fullname: {studentData.name}
+                        <br/>
+                        School: {studentData.school}
+                      </Typography>
+
+                    </div>
+                  ))}
+                </Grid>
+              </Grid>
+            </DialogContent>
+          </>
+          ): (
+            <DialogContentText
+              id="scroll-dialog-description"
+              ref={descriptionElementRef}
+              tabIndex={-1}
+            >
+              No data available.
+            </DialogContentText>         
           )
         }
 

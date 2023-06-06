@@ -23,14 +23,16 @@ import {
   TablePagination,
   Link
 } from '@mui/material';
+import SummarizeIcon from '@mui/icons-material/Summarize';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 // components
-import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 import USERLIST from '../_mock/user';
+import STUDENTDETAILS from '../_mock/studentdetails';
 
 // ----------------------------------------------------------------------
 
@@ -38,9 +40,9 @@ const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
   { id: 'name', label: 'Name', alignRight: false },
   { id: 'studentId', label: 'StudentId', alignRight: false },
+  { id: 'cohort', label: 'Cohort', alignRight: false },
   { id: 'school', label: 'School', alignRight: false },
   { id: 'studentDetails', label: 'Student Details', alignRight: false },
-  { id: 'grade', label: 'Grade', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -89,9 +91,14 @@ export default function UserPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const [quantity, setQuantity] = useState(10);
 
-  const handleCloseMenu = () => {
-    setOpen(null);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   const handleRequestSort = (event, property) => {
@@ -155,8 +162,10 @@ export default function UserPage() {
           <Typography variant="h4" gutterBottom>
             User
           </Typography>
+          <Button variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
+            Settings
+          </Button>
         </Stack>
-
         <Card>
           <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
@@ -174,7 +183,7 @@ export default function UserPage() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, name, studentId, school } = row;
+                    const { no, name, studentId, cohort, school } = row;
                     const selectedUser = selected.indexOf(name) !== -1;
 
                     return (
@@ -192,19 +201,12 @@ export default function UserPage() {
 
                         <TableCell align="left">{studentId}</TableCell>
 
+                        <TableCell align="left">{cohort}</TableCell>
+
                         <TableCell align="left">{school}</TableCell>
 
-
                         <TableCell align="center">
-                          <Link component={RouterLink} to="/" variant="subtitle2" underline="hover">
-                            <IconButton size="large" color="inherit">
-                              <Iconify icon={'fluent:open-16-filled'} />
-                            </IconButton>
-                          </Link>
-                        </TableCell>
-
-                        <TableCell align="center">
-                          <Link component={RouterLink} to="/" variant="subtitle2" underline="hover">
+                          <Link component={RouterLink} to={`/student/${studentId}/details`} variant="subtitle2" underline="hover">
                             <IconButton size="large" color="inherit">
                               <Iconify icon={'fluent:open-16-filled'} />
                             </IconButton>
@@ -259,36 +261,12 @@ export default function UserPage() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: '20px'}}>
+        <Button variant="contained" size="large" color = "primary" startIcon={<SummarizeIcon />}>
+          Quantity: {quantity}
+        </Button>
+        </div>
       </Container>
-
-      <Popover
-        open={Boolean(open)}
-        anchorEl={open}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75,
-            },
-          },
-        }}
-      >
-        <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
-      </Popover>
     </>
   );
 }

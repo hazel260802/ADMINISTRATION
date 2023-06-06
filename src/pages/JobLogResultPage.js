@@ -7,23 +7,17 @@ import {
   Table,
   Stack,
   Paper,
-  Avatar,
   Button,
-  Popover,
-  Checkbox,
   TableRow,
-  MenuItem,
   TableBody,
   TableCell,
   Container,
   Typography,
-  IconButton,
   TableContainer,
   TablePagination,
-  Link
 } from '@mui/material';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 // components
-import Label from '../components/label';
 import Scrollbar from '../components/scrollbar';
 import Dialog from '../components/dialog';
 // sections
@@ -157,6 +151,9 @@ export default function JobLogPage() {
           <Typography variant="h4" gutterBottom>
             Job Log Result
           </Typography>
+          <Button variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
+            Settings
+          </Button>
         </Stack>
 
         <Card>

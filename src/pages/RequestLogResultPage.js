@@ -7,31 +7,22 @@ import {
   Table,
   Stack,
   Paper,
-  Avatar,
   Button,
-  Popover,
-  Checkbox,
   TableRow,
-  MenuItem,
   TableBody,
   TableCell,
   Container,
   Typography,
-  IconButton,
   TableContainer,
   TablePagination,
-  Link
 } from '@mui/material';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 // components
-import Label from '../components/label';
-import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
-import Dialog from '../components/dialog';
 // sections
 import { JobLogListHead, JobLogListToolbar } from '../sections/@dashboard/joblog';
 // mock
 import JOBLOGLIST from '../_mock/joblog';
-import LOGDETAILS from '../_mock/logdetails';
 
 // ----------------------------------------------------------------------
 
@@ -41,7 +32,8 @@ const TABLE_HEAD = [
   { id: 'method', label: 'Method', alignRight: false },
   { id: 'url', label: 'URL', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
-  { id: 'details', label: 'Details', alignRight: false },
+  { id: 'time', label: 'Time', alignRight: false },
+  { id: 'responeTime', label: 'Respone Time', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -160,6 +152,9 @@ export default function UserPage() {
           <Typography variant="h4" gutterBottom>
             Request Log Result
           </Typography>
+          <Button variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
+            Settings
+          </Button>
         </Stack>
 
         <Card>
@@ -179,7 +174,7 @@ export default function UserPage() {
                 />
                 <TableBody>
                   {filteredJobLog.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, studentId, method, url, status} = row;
+                    const { no, studentId, method, url, status, time, reponseTime} = row;
                     const selectedJobLog = selected.indexOf(studentId) !== -1;
 
                     return (
@@ -195,20 +190,15 @@ export default function UserPage() {
                           </Stack>
                         </TableCell>
 
-                        <TableCell align="left">{method}</TableCell>
+                        <TableCell align="center">{method}</TableCell>
 
                         <TableCell align="left">{url}</TableCell>
 
-                        <TableCell align="left">{status}</TableCell>
+                        <TableCell align="center">{status}</TableCell>
 
-                        <TableCell align="left">
-                              <Dialog
-                                open={open}
-                                onClose={handleClose}
-                                data={LOGDETAILS}
-                                type={'log'}
-                              />
-                        </TableCell>
+                        <TableCell align="left">{time.toString()}</TableCell>
+
+                        <TableCell align="center">{reponseTime} ms</TableCell>
 
                       </TableRow>
                       

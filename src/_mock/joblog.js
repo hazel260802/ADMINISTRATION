@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import { sample } from 'lodash';
 
 // ----------------------------------------------------------------------
 
@@ -9,6 +8,8 @@ const timetable = [...Array(24)].map((_, index) => ({
   method: faker.internet.httpMethod(),
   url: faker.internet.url(),
   status: faker.internet.httpStatusCode(),
+  time: faker.datatype.datetime(),
+  reponseTime: faker.datatype.number(100000),
 }));
 
 export default timetable;
