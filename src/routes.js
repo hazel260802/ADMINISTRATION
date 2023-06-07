@@ -11,6 +11,7 @@ import RequestLogResultPage from './pages/RequestLogResultPage';
 import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
 import ProductsPage from './pages/ProductsPage';
+import StudentDetailsPage from './pages/StudentDetailsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 
 // ----------------------------------------------------------------------
@@ -24,7 +25,14 @@ export default function Router() {
         { element: <Navigate to="/dashboard/app" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
         { path: 'timetable', element: <TimeTablePage /> },
-        { path: 'user', element: <UserPage /> },
+        { 
+          path: 'user',
+          element: <UserPage />,
+        },
+        {
+          path: 'user/:id/details',
+          element: <StudentDetailsPage />,
+        },
         { path: 'joblog', element: <JobLogResultPage /> },
         { path: 'requestlog', element: <RequestLogResultPage /> },
         { path: 'products', element: <ProductsPage /> },
@@ -47,6 +55,7 @@ export default function Router() {
       path: '*',
       element: <Navigate to="/404" replace />,
     },
+
   ]);
 
   return routes;

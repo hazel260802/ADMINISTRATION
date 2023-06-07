@@ -3,10 +3,15 @@ import { faker } from '@faker-js/faker';
 // ----------------------------------------------------------------------
 
 const gpadata = [...Array(5)].map((_, index) => ({
-  id: faker.datatype.uuid(),
-  studentId: faker.datatype.uuid(),
-  semester: `Semester ${index + 1}`,
-  gpa: faker.datatype.float({ min: 1, max: 4, precision: 2 }),
+  termId: faker.datatype.number(20203),
+  GPA: faker.datatype.float(),
+  CPA: faker.datatype.float(),
+  passCredits: faker.datatype.number(200),
+  accumulatedCredits: faker.datatype.number(200),
+  debtCredits: faker.datatype.number(10),
+  registeredCredits: faker.datatype.number(10),
+  studentLevel: faker.lorem.word(10),
+  warningLevel: faker.lorem.word(10),
 }));
 
 export default gpadata;

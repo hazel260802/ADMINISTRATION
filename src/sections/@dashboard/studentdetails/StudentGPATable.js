@@ -1,48 +1,45 @@
 import { Helmet } from 'react-helmet-async';
+import { useState } from 'react';
 import { filter } from 'lodash';
 import { Link as RouterLink } from 'react-router-dom';
-import { useState } from 'react';
 // @mui
 import {
   Card,
   Table,
   Stack,
+  Typography,
+  TableContainer,
+  TablePagination,
+  Link,
+  IconButton,
   Paper,
-  Avatar,
-  Button,
-  Popover,
-  Checkbox,
   TableRow,
-  MenuItem,
   TableBody,
   TableCell,
   Container,
-  Typography,
-  IconButton,
-  TableContainer,
-  TablePagination,
-  Link
+  Button
 } from '@mui/material';
-import SummarizeIcon from '@mui/icons-material/Summarize';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 // components
-import Iconify from '../components/iconify';
-import Scrollbar from '../components/scrollbar';
+import Iconify from '../../../components/iconify';
+import Scrollbar from '../../../components/scrollbar';
 // sections
-import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
-// mock
-import USERLIST from '../_mock/user';
-import STUDENTDETAILS from '../_mock/studentdetails';
+import { UserListHead, UserListToolbar } from '../user';
+
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'no', label: 'No', alignRight: false },
-  { id: 'name', label: 'Name', alignRight: false },
-  { id: 'studentId', label: 'StudentId', alignRight: false },
-  { id: 'cohort', label: 'Cohort', alignRight: false },
-  { id: 'school', label: 'School', alignRight: false },
-  { id: 'studentDetails', label: 'Student Details', alignRight: false },
+  { id: 'termId', label: 'Term Id', alignRight: false },
+  { id: 'GPA', label: 'GPA', alignRight: false },
+  { id: 'CPA', label: 'CPA', alignRight: false },
+  { id: 'passCredits', label: 'Pass Credits', alignRight: false },
+  { id: 'accumulatedCredits', label: 'Accumulated Credits', alignRight: false },
+  { id: 'debtCredits', label: 'Debt Credits', alignRight: false },
+  { id: 'Registered Credits', label: 'Registered Credits', alignRight: false },
+  { id: 'studentLevel', label: 'Student Level', alignRight: false },
+  { id: 'warningLevel', label: 'Warning Level', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -76,7 +73,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function UserPage() {
+export default function StudentGPATable({data}) {
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -109,7 +106,7 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = data.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -145,30 +142,16 @@ export default function UserPage() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
+  const filteredDetails = applySortFilter(data, getComparator(order, orderBy), filterName);
 
-  const isNotFound = !filteredUsers.length && !!filterName;
+  const isNotFound = !filteredDetails.length && !!filterName;
 
   return (
     <>
-      <Helmet>
-        <title> User </title>
-      </Helmet>
-
       <Container>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h4" gutterBottom>
-            Student List
-          </Typography>
-          <Button variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
-            Settings
-          </Button>
-        </Stack>
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
-
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
@@ -176,43 +159,42 @@ export default function UserPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={data.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, name, studentId, cohort, school } = row;
-                    const selectedUser = selected.indexOf(name) !== -1;
+                  {filteredDetails.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    const { termId, GPA, CPA, passCredits, accumulatedCredits, debtCredits, registeredCredits, studentLevel, warningLevel } = row;
+                    const selectedUser = selected.indexOf(termId) !== -1;
 
                     return (
-                      <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                      <TableRow hover key={termId} tabIndex={-1} role="checkbox" selected={selectedUser}>
 
-                        <TableCell align="left">{no}</TableCell>
+                        <TableCell align="left">{termId}</TableCell>
+
+                        <TableCell align="left">{GPA}</TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
                             <Typography variant="subtitle2" noWrap>
-                              {name}
+                              {CPA}
                             </Typography>
                           </Stack>
                         </TableCell>
 
-                        <TableCell align="left">{studentId}</TableCell>
+                        <TableCell align="left">{passCredits}</TableCell>
 
-                        <TableCell align="left">{cohort}</TableCell>
+                        <TableCell align="left">{accumulatedCredits}</TableCell>
 
-                        <TableCell align="left">{school}</TableCell>
+                        <TableCell align="left">{debtCredits}</TableCell>
 
-                        <TableCell align="center">
-                          <Link component={RouterLink} to={`/dashboard/user/${studentId}/details`} variant="subtitle2" underline="hover">
-                            <IconButton size="large" color="inherit">
-                              <Iconify icon={'fluent:open-16-filled'} />
-                            </IconButton>
-                          </Link>
-                        </TableCell>
+                        <TableCell align="left">{registeredCredits}</TableCell>
 
+                        <TableCell align="left">{studentLevel}</TableCell>
+                        
+                        <TableCell align="left">{warningLevel}</TableCell>
                       </TableRow>
                       
                     );
@@ -254,18 +236,13 @@ export default function UserPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={USERLIST.length}
+            count={data.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
-        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: '20px'}}>
-        <Button variant="contained" size="large" color = "primary" startIcon={<SummarizeIcon />}>
-          Quantity: {quantity}
-        </Button>
-        </div>
       </Container>
     </>
   );

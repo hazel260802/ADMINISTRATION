@@ -4,10 +4,15 @@ import { sample } from 'lodash';
 // ----------------------------------------------------------------------
 
 const languagedata = [...Array(5)].map((_, index) => ({
-  id: faker.datatype.uuid(),
   studentId: faker.datatype.uuid(),
-  language: sample(['English', 'French', 'Spanish', 'German']),
-  proficiency: sample(['Beginner', 'Intermediate', 'Advanced']),
+  name: faker.name.fullName(),
+  dob: faker.date.birthdate().toString(),
+  termId: faker.datatype.number(20203),
+  note: faker.lorem.sentence(),
+  date: faker.date.birthdate().toString(),
+  listening: faker.datatype.number(),
+  reading: faker.datatype.number(),
+  total: faker.datatype.number(),
 }));
 
 export default languagedata;
