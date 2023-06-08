@@ -46,7 +46,7 @@ export default function LoginPage() {
   return (
     <>
       <Helmet>
-        <title> Login | Minimal UI </title>
+        <title> Login </title>
       </Helmet>
 
       <StyledRoot>
@@ -70,10 +70,10 @@ export default function LoginPage() {
         <Container maxWidth="sm">
           <StyledContent>
             <Typography variant="h4" gutterBottom>
-              Sign in to Minimal
+              Login
             </Typography>
 
-            <Typography variant="body2" sx={{ mb: 5 }}>
+            {/* <Typography variant="body2" sx={{ mb: 5 }}>
               Don’t have an account? {''}
               <Link variant="subtitle2">Get started</Link>
             </Typography>
@@ -96,7 +96,7 @@ export default function LoginPage() {
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 OR
               </Typography>
-            </Divider>
+            </Divider> */}
 
             <LoginForm />
           </StyledContent>

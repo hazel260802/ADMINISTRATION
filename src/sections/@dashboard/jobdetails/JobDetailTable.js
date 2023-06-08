@@ -40,7 +40,7 @@ const KEY_TITLE = [
   { id: 'columnKey', value: 'classIds', label: 'Class Ids', alignRight: false },
   { id: 'columnKey', value: 'timeToStart', label: 'Time To Start', alignRight: false },
   { id: 'columnKey', value: 'status', label: 'Status', alignRight: false },
-  { id: 'columnKey', value: 'createAt', label: 'Created At', alignRight: false },
+  { id: 'columnKey', value: 'createdAt', label: 'Created At', alignRight: false },
   { id: 'columnKey', value: 'doingAt', label: 'Doing At', alignRight: false },
   { id: 'columnKey', value: 'termId', label: 'TermId', alignRight: false },
 ];

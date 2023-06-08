@@ -162,7 +162,7 @@ export default function UserPage() {
           <Typography variant="h4" gutterBottom>
             Student List
           </Typography>
-          <Button variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
+          <Button component={RouterLink} to={`/dashboard/settings`} variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
             Settings
           </Button>
         </Stack>
