@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import {
   Card,
@@ -15,9 +16,12 @@ import {
   Typography,
   TableContainer,
   TablePagination,
+  Link,
+  IconButton
 } from '@mui/material';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 // components
+import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 import Dialog from '../components/dialog';
 // sections
@@ -29,7 +33,8 @@ import LOGDETAILS from '../_mock/logdetails';
 
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
-  { id: 'studentId', label: 'StudentId', alignRight: false },
+  { id: 'studentId', label: 'Student Id', alignRight: false },
+  { id: 'jobId', label: 'Job Id', alignRight: false },
   { id: 'method', label: 'Method', alignRight: false },
   { id: 'url', label: 'URL', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
@@ -151,7 +156,7 @@ export default function JobLogPage() {
           <Typography variant="h4" gutterBottom>
             Job Log Result
           </Typography>
-          <Button variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
+          <Button component={RouterLink} to={`/dashboard/settings`}  variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
             Settings
           </Button>
         </Stack>
@@ -173,7 +178,7 @@ export default function JobLogPage() {
                 />
                 <TableBody>
                   {filteredJobLog.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, studentId, method, url, status} = row;
+                    const { no, studentId, jobId, method, url, status} = row;
                     const selectedJobLog = selected.indexOf(studentId) !== -1;
 
                     return (
@@ -189,19 +194,20 @@ export default function JobLogPage() {
                           </Stack>
                         </TableCell>
 
+                        <TableCell align="left">{jobId}</TableCell>
+
                         <TableCell align="left">{method}</TableCell>
 
                         <TableCell align="left">{url}</TableCell>
 
                         <TableCell align="left">{status}</TableCell>
 
-                        <TableCell align="left">
-                              <Dialog
-                                open={open}
-                                onClose={handleClose}
-                                data={LOGDETAILS}
-                                type={'log'}
-                              />
+                        <TableCell align="center">
+                          <Link component={RouterLink} to={`/dashboard/joblog/${jobId}/details`} variant="subtitle2" underline="hover">
+                            <IconButton size="large" color="inherit">
+                              <Iconify icon={'fluent:open-16-filled'} />
+                            </IconButton>
+                          </Link>
                         </TableCell>
 
                       </TableRow>

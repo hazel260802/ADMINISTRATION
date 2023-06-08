@@ -13,6 +13,8 @@ import Page404 from './pages/Page404';
 import ProductsPage from './pages/ProductsPage';
 import StudentDetailsPage from './pages/StudentDetailsPage';
 import DashboardAppPage from './pages/DashboardAppPage';
+import JobDetailsPage from './pages/JobDetailsPage';
+import SettingPage from './pages/SettingPage';
 
 // ----------------------------------------------------------------------
 
@@ -34,9 +36,14 @@ export default function Router() {
           element: <StudentDetailsPage />,
         },
         { path: 'joblog', element: <JobLogResultPage /> },
+        {
+          path: 'joblog/:id/details',
+          element: <JobDetailsPage />,
+        },
         { path: 'requestlog', element: <RequestLogResultPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
+        { path: 'settings', element: <SettingPage /> },
       ],
     },
     {

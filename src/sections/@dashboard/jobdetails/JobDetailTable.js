@@ -1,40 +1,48 @@
 import { Helmet } from 'react-helmet-async';
-import { filter } from 'lodash';
 import { useState } from 'react';
+import { filter } from 'lodash';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import {
   Card,
   Table,
   Stack,
+  Typography,
+  TableContainer,
+  TablePagination,
+  Link,
+  IconButton,
   Paper,
-  Button,
   TableRow,
   TableBody,
   TableCell,
   Container,
-  Typography,
-  TableContainer,
-  TablePagination,
+  Button
 } from '@mui/material';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 // components
-import Scrollbar from '../components/scrollbar';
+import Iconify from '../../../components/iconify';
+import Scrollbar from '../../../components/scrollbar';
 // sections
-import { JobLogListHead, JobLogListToolbar } from '../sections/@dashboard/joblog';
-// mock
-import JOBLOGLIST from '../_mock/joblog';
+import { UserListHead } from '../user';
+
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'no', label: 'No', alignRight: false },
-  { id: 'studentId', label: 'StudentId', alignRight: false },
-  { id: 'method', label: 'Method', alignRight: false },
-  { id: 'url', label: 'URL', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
-  { id: 'time', label: 'Time', alignRight: false },
-  { id: 'responeTime', label: 'Respone Time', alignRight: false },
+  { id: 'key', label: 'Key', alignRight: false },
+  { id: 'value', label: 'Value', alignRight: false },
+];
+
+const KEY_TITLE = [
+  { id: 'columnKey', value: 'username', label: 'Username', alignRight: false },
+  { id: 'columnKey', value: 'classIds', label: 'Class Ids', alignRight: false },
+  { id: 'columnKey', value: 'timeToStart', label: 'Time To Start', alignRight: false },
+  { id: 'columnKey', value: 'status', label: 'Status', alignRight: false },
+  { id: 'columnKey', value: 'createAt', label: 'Created At', alignRight: false },
+  { id: 'columnKey', value: 'doingAt', label: 'Doing At', alignRight: false },
+  { id: 'columnKey', value: 'termId', label: 'TermId', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
@@ -68,7 +76,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function RequestLogPage() {
+export default function StudentGPATable({data}) {
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -83,6 +91,7 @@ export default function RequestLogPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const [quantity, setQuantity] = useState(10);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -100,7 +109,7 @@ export default function RequestLogPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = JOBLOGLIST.map((n) => n.name);
+      const newSelecteds = data.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -136,73 +145,69 @@ export default function RequestLogPage() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - JOBLOGLIST.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
-  const filteredJobLog = applySortFilter(JOBLOGLIST, getComparator(order, orderBy), filterName);
+  const filteredDetails = applySortFilter(data, getComparator(order, orderBy), filterName);
 
-  const isNotFound = !filteredJobLog.length && !!filterName;
+  const isNotFound = !filteredDetails.length && !!filterName;
 
   return (
     <>
-      <Helmet>
-        <title> Job Log Result </title>
-      </Helmet>
-
       <Container>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h4" gutterBottom>
-            Request Log Result
-          </Typography>
-          <Button component={RouterLink} to={`/dashboard/settings`}  variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
-            Settings
-          </Button>
-        </Stack>
-
         <Card>
-          <JobLogListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
-
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
-                <JobLogListHead
+                <UserListHead
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={JOBLOGLIST.length}
+                  rowCount={data.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredJobLog.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, studentId, method, url, status, time, reponseTime} = row;
-                    const selectedJobLog = selected.indexOf(studentId) !== -1;
+                  {filteredDetails.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    const { username, classIds, timeToStart, status, createdAt, doingAt, termId} = row;
+                    const selectedKey = selected.indexOf(KEY_TITLE.label) !== -1;
 
                     return (
-                      <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedJobLog}>
-
-                        <TableCell align="left">{no}</TableCell>
-
+                    <>
+                    {KEY_TITLE.map((key) => (
+                      <TableRow hover key={key.label} tabIndex={-1} role="checkbox" selected={selectedKey} 
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 }}}>
                         <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" marginLeft={2} spacing={2}>
-                            <Typography variant="subtitle2" noWrap>
-                              {studentId}
-                            </Typography>
-                          </Stack>
+                          {key.id === 'columnKey' && (
+                            <Stack direction="row" alignItems="center" align="center" spacing={5}>
+                              <Typography marginLeft={2} align="center" variant="subtitle2" noWrap>
+                                {key.label}
+                              </Typography>
+                            </Stack>
+                          )}
                         </TableCell>
-
-                        <TableCell align="center">{method}</TableCell>
-
-                        <TableCell align="left">{url}</TableCell>
-
-                        <TableCell align="center">{status}</TableCell>
-
-                        <TableCell align="left">{time.toString()}</TableCell>
-
-                        <TableCell align="center">{reponseTime} ms</TableCell>
-
+                          {key.value === 'username' ? (
+                              <TableCell align="left">{username}</TableCell>
+                            ): key.value === 'classIds' ? (
+                              <TableCell align="left">{classIds}</TableCell>
+                            ): key.value === 'timeToStart' ? (
+                              <TableCell align="left">{timeToStart}</TableCell>
+                            ): key.value === 'status' ? (
+                              <TableCell align="left">{status}</TableCell>
+                            ): key.value === 'createdAt' ? (
+                              <TableCell align="left">{createdAt}</TableCell>
+                            ): key.value === 'doingAt' ? (
+                              <TableCell align="left">{doingAt}</TableCell>
+                            ): key.value === 'termId' ? (
+                              <TableCell align="left">{termId}</TableCell>
+                            ): (
+                              <TableCell align="left">{'Error!'}</TableCell>
+                            )
+                          }
                       </TableRow>
-                      
+                  ))}
+
+                </>
                     );
                   })}
                   {emptyRows > 0 && (
@@ -242,7 +247,7 @@ export default function RequestLogPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={JOBLOGLIST.length}
+            count={data.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -250,7 +255,6 @@ export default function RequestLogPage() {
           />
         </Card>
       </Container>
-
     </>
   );
 }

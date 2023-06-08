@@ -31,32 +31,18 @@ import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
-import {StudentGPATable, StudentInfo, StudentLanguageTable, StudentSubjectTable} from '../sections/@dashboard/studentdetails'
+import {JobDetailTable, JobResultTable} from '../sections/@dashboard/jobdetails'
 // mock
-import GPA_DATA from '../_mock/gpadata';
-import SUBJECTDATA from '../_mock/subjectdata';
-import LANGUAGEDATA from '../_mock/languagedata';
-import STUDENTDETAILS from '../_mock/studentdetails'
+import JOBDETAILS from '../_mock/jobdetails';
+import LOGRESULTS from '../_mock/logdetails';
+
 
 // ----------------------------------------------------------------------
 
-const TABLE_HEAD = [
-  { id: 'termId', label: 'Term Id', alignRight: false },
-  { id: 'GPA', label: 'GPA', alignRight: false },
-  { id: 'CPA', label: 'CPA', alignRight: false },
-  { id: 'passCredits', label: 'Pass Credits', alignRight: false },
-  { id: 'accumulatedCredits', label: 'Accumulated Credits', alignRight: false },
-  { id: 'debtCredits', label: 'Debt Credits', alignRight: false },
-  { id: 'Registered Credits', label: 'Registered Credits', alignRight: false },
-  { id: 'studentLevel', label: 'Student Level', alignRight: false },
-  { id: 'warningLevel', label: 'Warning Level', alignRight: false },
-];
 
 const tabs = [
-  { id: 'info', label: 'Student Information', component: StudentInfo, data: STUDENTDETAILS },
-  { id: 'language', label: 'Language Grade', component: StudentLanguageTable, data: LANGUAGEDATA },
-  { id: 'subject', label: 'Subject Grade', component: StudentSubjectTable, data: SUBJECTDATA },
-  { id: 'semester', label: 'Subject Semester', component: StudentGPATable, data: GPA_DATA },
+  { id: 'job', label: 'Job Log Details', component: JobDetailTable, data: JOBDETAILS },
+  { id: 'result', label: 'Job Log Results', component: JobResultTable, data: LOGRESULTS },
 ];
 
 // ----------------------------------------------------------------------
@@ -124,80 +110,24 @@ export default function StudentDetailsPage() {
 
   const [quantity, setQuantity] = useState(10);
 
-  const [value, setValue] = React.useState('info');
+  const [value, setValue] = React.useState('job');
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = GPA_DATA.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
-  };
-
-  const handleFilterByName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
-  };
-
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - GPA_DATA.length) : 0;
-
-  const filteredUsers = applySortFilter(GPA_DATA, getComparator(order, orderBy), filterName);
-
-  const isNotFound = !filteredUsers.length && !!filterName;
 
   return (
     <>
       <Helmet>
-        <title> User </title>
+        <title> Job Details </title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Student Details
+            Job Details
           </Typography>
           <Button component={RouterLink} to={`/dashboard/settings`}  variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
             Settings

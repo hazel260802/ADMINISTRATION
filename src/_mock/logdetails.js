@@ -3,12 +3,18 @@ import { sample } from 'lodash';
 
 // ----------------------------------------------------------------------
 
-const logdetails = [...Array(1)].map((_, index) => ({
-  no: index + 1,
-  jobId: faker.datatype.uuid(),
+const logdetails = [...Array(2)].map((_, index) => ({
   workerId: faker.datatype.uuid(),
-  ownerAccountId: faker.datatype.uuid(),
-  logs: faker.lorem.paragraph(),
+  stepIdx: faker.datatype.number(),
+  action: faker.lorem.sentence(),
+  at: faker.lorem.words(),
+  output: faker.lorem.words(),
+  nestingLogs: [...Array(2)].map((_, index) => ({
+    stepIdx: faker.datatype.number(),
+    action: faker.lorem.sentence(),
+    at: faker.lorem.words(),
+    output: faker.lorem.words(),
+  }))
 }));
 
 export default logdetails;

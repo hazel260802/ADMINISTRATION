@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import {
   Card,
@@ -15,6 +16,8 @@ import {
   Typography,
   TableContainer,
   TablePagination,
+  IconButton,
+  Link
 } from '@mui/material';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import SummarizeIcon from '@mui/icons-material/Summarize';
@@ -35,6 +38,7 @@ const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
   { id: 'studentId', label: 'StudentId', alignRight: false },
   { id: 'termId', label: 'TermId', alignRight: false },
+  { id: 'jobId', label: 'JobId', alignRight: false },
   { id: 'jobDetails', label: 'Job Details', alignRight: false },
 ];
 
@@ -69,7 +73,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function UserPage() {
+export default function TimeTablePage() {
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -156,7 +160,7 @@ export default function UserPage() {
           <Typography variant="h4" gutterBottom>
             TimeTable
           </Typography>
-          <Button variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
+          <Button component={RouterLink} to={`/dashboard/settings`}  variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
             Settings
           </Button>
         </Stack>
@@ -178,7 +182,7 @@ export default function UserPage() {
                 />
                 <TableBody>
                   {filteredTimeTable.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, studentId, termId} = row;
+                    const { no, studentId, jobId, termId} = row;
                     const selectedTimeTable = selected.indexOf(studentId) !== -1;
 
                     return (
@@ -196,13 +200,14 @@ export default function UserPage() {
 
                         <TableCell align="left">{termId}</TableCell>
 
+                        <TableCell align="left">{jobId}</TableCell>
+
                         <TableCell align="left">
-                              <Dialog
-                                open={open}
-                                onClose={handleClose}
-                                data={JOBDETAILS}
-                                type={'job'}
-                              />
+                          <Link component={RouterLink} to={`/dashboard/joblog/${jobId}/details`} variant="subtitle2" underline="hover">
+                            <IconButton size="large" color="inherit">
+                              <Iconify icon={'fluent:open-16-filled'} />
+                            </IconButton>
+                          </Link>
                         </TableCell>
 
                       </TableRow>

@@ -3,17 +3,17 @@ import { sample } from 'lodash';
 
 // ----------------------------------------------------------------------
 
-const jobdetails = [...Array(3)].map((_, index) => ({
+const jobdetails = [...Array(1)].map((_, index) => ({
   jobId: faker.datatype.uuid(),
   ownerAccountId: faker.datatype.uuid(),
   username: faker.name.fullName(),
   password: faker.datatype.uuid(),
   classIds: faker.datatype.array(),
-  timeToStart: faker.date.birthdate(),
-  originTimeToStart: faker.date.birthdate(),
+  timeToStart: faker.date.birthdate().toString(),
+  originTimeToStart: faker.date.birthdate().toString(),
   status: faker.internet.httpStatusCode(),
-  createdAt: faker.date.birthdate(),
-  doingAt: faker.date.birthdate(),
+  createdAt: faker.date.birthdate().toString(),
+  doingAt: faker.date.birthdate().toString(),
   iv: faker.datatype.uuid(),
   no: faker.datatype.number(),
   termId: faker.datatype.number(20220),
