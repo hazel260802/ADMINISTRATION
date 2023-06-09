@@ -12,7 +12,7 @@ const users = [...Array(1)].map((_, index) => ({
   school: faker.company.name(),
   studyStatus: faker.lorem.word(10),
   gender: faker.lorem.word(5),
-  class: faker.lorem.words(5),
+  studentClass: faker.lorem.words(5),
   cohort: faker.datatype.number(100),
   email: faker.internet.email(),
 }));
