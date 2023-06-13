@@ -1,7 +1,5 @@
-import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
 import { filter } from 'lodash';
-import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import {
   Card,
@@ -9,25 +7,16 @@ import {
   Stack,
   Typography,
   TableContainer,
-  TablePagination,
-  Link,
-  IconButton,
   Paper,
   TableRow,
   TableBody,
   TableCell,
   Container,
-  Button,
-  Grid
 } from '@mui/material';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-import SummarizeIcon from '@mui/icons-material/Summarize';
 // components
-import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 // sections
 import { UserListHead } from '../user';
-
 
 // ----------------------------------------------------------------------
 
@@ -144,14 +133,13 @@ export default function StudentGPATable({ data }) {
     setPage(newPage);
   };
 
-
   const handleFilterByName = (event) => {
     setPage(0);
     setFilterName(event.target.value);
   };
 
   const filteredDetails = applySortFilter(data, getComparator(order, orderBy), filterName);
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) - data.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, 1 + page - data.length) : 0;
   const isNotFound = !filteredDetails.length && !!filterName;
 
   return (
@@ -172,59 +160,69 @@ export default function StudentGPATable({ data }) {
                 />
                 <TableBody>
                   {filteredDetails.map((row) => {
-                    const { studentId, name, yearOfAdmission, degreeProgram, program, school, studyStatus, gender, studentClass, cohort, email } = row;
+                    const {
+                      studentId,
+                      name,
+                      yearOfAdmission,
+                      degreeProgram,
+                      program,
+                      school,
+                      studyStatus,
+                      gender,
+                      studentClass,
+                      cohort,
+                      email,
+                    } = row;
                     const isItemSelected = selected.indexOf(name) !== -1;
 
                     return (
                       <>
-                      {KEY_TITLE.map((key) => (
-                        <TableRow
-                          hover
-                          key={studentId}
-                          tabIndex={-1}
-                          role="checkbox"
-                          selected={isItemSelected}
-                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                        >
-           <TableCell component="th" scope="row" padding="none">
-                          {key.id === 'columnKey' && (
-                            <Stack direction="row" alignItems="center" align="center" spacing={5}>
-                              <Typography marginLeft={2} align="center" variant="subtitle2" noWrap>
-                                {key.label}
-                              </Typography>
-                            </Stack>
-                          )}
-                        </TableCell>
-                          {key.value === 'studentId' ? (
+                        {KEY_TITLE.map((key) => (
+                          <TableRow
+                            hover
+                            key={studentId}
+                            tabIndex={-1}
+                            role="checkbox"
+                            selected={isItemSelected}
+                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                          >
+                            <TableCell component="th" scope="row" padding="none">
+                              {key.id === 'columnKey' && (
+                                <Stack direction="row" alignItems="center" align="center" spacing={5}>
+                                  <Typography marginLeft={2} align="center" variant="subtitle2" noWrap>
+                                    {key.label}
+                                  </Typography>
+                                </Stack>
+                              )}
+                            </TableCell>
+                            {key.value === 'studentId' ? (
                               <TableCell align="left">{studentId}</TableCell>
-                            ): key.value === 'name' ? (
+                            ) : key.value === 'name' ? (
                               <TableCell align="left">{name}</TableCell>
-                            ): key.value === 'yearOfAdmission' ? (
+                            ) : key.value === 'yearOfAdmission' ? (
                               <TableCell align="left">{yearOfAdmission}</TableCell>
-                            ): key.value === 'degreeProgram' ? (
+                            ) : key.value === 'degreeProgram' ? (
                               <TableCell align="left">{degreeProgram}</TableCell>
-                            ): key.value === 'program' ? (
+                            ) : key.value === 'program' ? (
                               <TableCell align="left">{program}</TableCell>
-                            ): key.value === 'school' ? (
+                            ) : key.value === 'school' ? (
                               <TableCell align="left">{school}</TableCell>
-                            ): key.value === 'studyStatus' ? (
+                            ) : key.value === 'studyStatus' ? (
                               <TableCell align="left">{studyStatus}</TableCell>
-                            ): key.value === 'gender' ? (
+                            ) : key.value === 'gender' ? (
                               <TableCell align="left">{gender}</TableCell>
-                            ): key.value === 'studentClass' ? (
+                            ) : key.value === 'studentClass' ? (
                               <TableCell align="left">{studentClass}</TableCell>
-                            ): key.value === 'cohort' ? (
+                            ) : key.value === 'cohort' ? (
                               <TableCell align="left">{cohort}</TableCell>
-                            ): key.value === 'email' ? (
+                            ) : key.value === 'email' ? (
                               <TableCell align="left">{email}</TableCell>
-                            ): (
+                            ) : (
                               <TableCell align="left">{'Error!'}</TableCell>
-                            )
-                          }
-                      </TableRow>
-                  ))}
-
-                </>
+                            )}
+                          </TableRow>
+                        ))}
+                      </>
                     );
                   })}
                   {emptyRows > 0 && (

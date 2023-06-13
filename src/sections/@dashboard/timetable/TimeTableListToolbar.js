@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
-import { Toolbar, Tooltip, IconButton, Typography, OutlinedInput, InputAdornment, Stack } from '@mui/material';
+import { Toolbar, Typography, OutlinedInput, InputAdornment, Stack } from '@mui/material';
 // component
 import Iconify from '../../../components/iconify';
 import TimeTableSort from './TimeTableSort';
@@ -65,7 +65,7 @@ export default function UserListToolbar({ numSelected, filterName, onFilterName 
         />
       )}
       <Stack direction="row" flexWrap="wrap-reverse" alignItems="center" justifyContent="flex-end" sx={{ mb: 1 }}>
-          <TimeTableSort />
+        <TimeTableSort />
       </Stack>
     </StyledRoot>
   );

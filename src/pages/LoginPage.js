@@ -1,16 +1,10 @@
 import { Helmet } from 'react-helmet-async';
-// @mui
 import { styled } from '@mui/material/styles';
-import { Link, Container, Typography, Divider, Stack, Button } from '@mui/material';
-// hooks
+import { Link, Container, Typography } from '@mui/material';
 import useResponsive from '../hooks/useResponsive';
-// components
 import Logo from '../components/logo';
 import Iconify from '../components/iconify';
-// sections
 import { LoginForm } from '../sections/auth/login';
-
-// ----------------------------------------------------------------------
 
 const StyledRoot = styled('div')(({ theme }) => ({
   [theme.breakpoints.up('md')]: {
@@ -38,10 +32,43 @@ const StyledContent = styled('div')(({ theme }) => ({
   padding: theme.spacing(12, 0),
 }));
 
-// ----------------------------------------------------------------------
-
 export default function LoginPage() {
   const mdUp = useResponsive('up', 'md');
+
+  async function handleFormSubmit(data) {
+    const mode = data.mode || 'login';
+
+    if (mode !== 'login' && mode !== 'signup') {
+      throw new Error('Unsupported mode.');
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/${mode}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Could not authenticate user.');
+      }
+
+      const resData = await response.json();
+      const token = resData.token;
+
+      localStorage.setItem('token', token);
+      const expiration = new Date();
+      expiration.setHours(expiration.getHours() + 1);
+      localStorage.setItem('expiration', expiration.toISOString());
+
+      // Redirect using client-side navigation after successful authentication
+      window.location.href = '/';  // Replace with your desired URL
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <>
@@ -73,32 +100,7 @@ export default function LoginPage() {
               Login
             </Typography>
 
-            {/* <Typography variant="body2" sx={{ mb: 5 }}>
-              Don’t have an account? {''}
-              <Link variant="subtitle2">Get started</Link>
-            </Typography>
-
-            <Stack direction="row" spacing={2}>
-              <Button fullWidth size="large" color="inherit" variant="outlined">
-                <Iconify icon="eva:google-fill" color="#DF3E30" width={22} height={22} />
-              </Button>
-
-              <Button fullWidth size="large" color="inherit" variant="outlined">
-                <Iconify icon="eva:facebook-fill" color="#1877F2" width={22} height={22} />
-              </Button>
-
-              <Button fullWidth size="large" color="inherit" variant="outlined">
-                <Iconify icon="eva:twitter-fill" color="#1C9CEA" width={22} height={22} />
-              </Button>
-            </Stack>
-
-            <Divider sx={{ my: 3 }}>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                OR
-              </Typography>
-            </Divider> */}
-
-            <LoginForm />
+            <LoginForm onSubmit={() => handleFormSubmit} />
           </StyledContent>
         </Container>
       </StyledRoot>

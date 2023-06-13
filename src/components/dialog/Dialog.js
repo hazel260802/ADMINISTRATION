@@ -11,12 +11,12 @@ import {
   ListItem,
   ListItemText,
   Typography,
-  Grid
+  Grid,
 } from '@mui/material';
 // components
 import Iconify from '../iconify';
 
-export default function ScrollDialog({data = [], type}) {
+export default function ScrollDialog({ data = [], type }) {
   const [open, setOpen] = React.useState(false);
   const [scroll, setScroll] = React.useState('paper');
 
@@ -51,55 +51,50 @@ export default function ScrollDialog({data = [], type}) {
         aria-labelledby="scroll-dialog-title"
         aria-describedby="scroll-dialog-description"
       >
-        {
-          type === 'log' ? (
-            <>
-              <DialogTitle id="scroll-dialog-title">Log Details</DialogTitle>
-              <DialogContent dividers>
-                {data.length > 0 ? (
-                  <List>
-                    {data.map((item) => (
-                      <ListItem key={item.jobId}>
-                        <ListItemText
-                          primary={`Job ID: ${item.jobId}`}
-                          secondary={
-                            <>
-                              <Typography component="span" variant="body2">
-                                Worker ID: {item.workerId}
-                              </Typography>
-                              <br />
-                              <Typography component="span" variant="body2">
-                                Owner Account ID: {item.ownerAccountId}
-                              </Typography>
-                              <br />
-                              <Typography component="span" variant="body2">
-                                Logs: {item.logs}
-                              </Typography>
-                            </>
-                          }
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                ) : (
-                  <DialogContentText
-                    id="scroll-dialog-description"
-                    ref={descriptionElementRef}
-                    tabIndex={-1}
-                  >
-                    No data available.
-                  </DialogContentText>
-                )}
-              </DialogContent>
-            </>
-          ) : type === 'job' ? (
-            <>
-              <DialogTitle id="scroll-dialog-title">Job Details</DialogTitle>
-              <DialogContent dividers>
-                {data.length > 0 ? (
-                  <List>
-                    {data.map((item) => (
-                      <ListItem key={item.jobId}>
+        {type === 'log' ? (
+          <>
+            <DialogTitle id="scroll-dialog-title">Log Details</DialogTitle>
+            <DialogContent dividers>
+              {data.length > 0 ? (
+                <List>
+                  {data.map((item) => (
+                    <ListItem key={item.jobId}>
+                      <ListItemText
+                        primary={`Job ID: ${item.jobId}`}
+                        secondary={
+                          <>
+                            <Typography component="span" variant="body2">
+                              Worker ID: {item.workerId}
+                            </Typography>
+                            <br />
+                            <Typography component="span" variant="body2">
+                              Owner Account ID: {item.ownerAccountId}
+                            </Typography>
+                            <br />
+                            <Typography component="span" variant="body2">
+                              Logs: {item.logs}
+                            </Typography>
+                          </>
+                        }
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <DialogContentText id="scroll-dialog-description" ref={descriptionElementRef} tabIndex={-1}>
+                  No data available.
+                </DialogContentText>
+              )}
+            </DialogContent>
+          </>
+        ) : type === 'job' ? (
+          <>
+            <DialogTitle id="scroll-dialog-title">Job Details</DialogTitle>
+            <DialogContent dividers>
+              {data.length > 0 ? (
+                <List>
+                  {data.map((item) => (
+                    <ListItem key={item.jobId}>
                       <ListItemText
                         primary={`Job ID: ${item.jobId}`}
                         secondary={
@@ -111,7 +106,7 @@ export default function ScrollDialog({data = [], type}) {
                               <br />
                               Password: {item.password}
                               <br />
-                              Class IDs: {item.classIds.join(", ")}
+                              Class IDs: {item.classIds.join(', ')}
                               <br />
                               Time to Start: {item.timeToStart.toString()}
                               <br />
@@ -133,27 +128,23 @@ export default function ScrollDialog({data = [], type}) {
                               <br />
                               Next Job ID: {item.nextJobId}
                               <br />
-                              Delete Class IDs: {item.deleteClassIds.join(", ")}
+                              Delete Class IDs: {item.deleteClassIds.join(', ')}
                             </Typography>
                           </>
                         }
                       />
                     </ListItem>
-                    ))}
-                  </List>
-                ) : (
-                  <DialogContentText
-                    id="scroll-dialog-description"
-                    ref={descriptionElementRef}
-                    tabIndex={-1}
-                  >
-                    No data available.
-                  </DialogContentText>
-                )}
-              </DialogContent>
-            </>
-          ): type === 'student data' ? (
-            <>
+                  ))}
+                </List>
+              ) : (
+                <DialogContentText id="scroll-dialog-description" ref={descriptionElementRef} tabIndex={-1}>
+                  No data available.
+                </DialogContentText>
+              )}
+            </DialogContent>
+          </>
+        ) : type === 'student data' ? (
+          <>
             <DialogTitle id="scroll-dialog-title">Student Information</DialogTitle>
             <DialogContent dividers>
               <Grid container spacing={2}>
@@ -167,26 +158,20 @@ export default function ScrollDialog({data = [], type}) {
                     <div className="info-item">
                       <Typography component="div" variant="body2">
                         Fullname: {studentData.name}
-                        <br/>
+                        <br />
                         School: {studentData.school}
                       </Typography>
-
                     </div>
                   ))}
                 </Grid>
               </Grid>
             </DialogContent>
           </>
-          ): (
-            <DialogContentText
-              id="scroll-dialog-description"
-              ref={descriptionElementRef}
-              tabIndex={-1}
-            >
-              No data available.
-            </DialogContentText>         
-          )
-        }
+        ) : (
+          <DialogContentText id="scroll-dialog-description" ref={descriptionElementRef} tabIndex={-1}>
+            No data available.
+          </DialogContentText>
+        )}
 
         <DialogActions>
           <Button onClick={handleClose}>Close</Button>

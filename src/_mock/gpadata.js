@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 
 // ----------------------------------------------------------------------
 
-const gpadata = [...Array(5)].map((_, index) => ({
+const gpadata = [...Array(5)].map(() => ({
   termId: faker.datatype.number(20203),
   GPA: faker.datatype.float(),
   CPA: faker.datatype.float(),

@@ -1,9 +1,8 @@
 import { faker } from '@faker-js/faker';
-import { sample } from 'lodash';
 
 // ----------------------------------------------------------------------
 
-const users = [...Array(1)].map((_, index) => ({
+const users = [...Array(1)].map(() => ({
   studentId: faker.datatype.uuid(),
   name: faker.name.fullName(),
   yearOfAdmission: faker.datatype.number(20020),

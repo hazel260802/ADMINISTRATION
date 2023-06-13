@@ -1,7 +1,8 @@
-import { Navigate, useRoutes } from 'react-router-dom';
+import { Navigate, createBrowserRouter } from 'react-router-dom';
 // layouts
 import DashboardLayout from './layouts/dashboard';
 import SimpleLayout from './layouts/simple';
+import { AppLayout } from './App';
 //
 import TimeTablePage from './pages/TimeTablePage';
 import UserPage from './pages/UserPage';
@@ -15,51 +16,58 @@ import JobDetailsPage from './pages/JobDetailsPage';
 import SettingPage from './pages/SettingPage';
 
 // ----------------------------------------------------------------------
-
-export default function Router() {
-  const routes = useRoutes([
-    {
-      path: '/dashboard',
-      element: <DashboardLayout />,
-      children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
-        { path: 'app', element: <UserPage /> },
-        { 
-          path: 'user',
-          element: <UserPage />,
-        },
-        { path: 'timetable', element: <TimeTablePage /> },
-        {
-          path: 'user/:id/details',
-          element: <StudentDetailsPage />,
-        },
-        { path: 'joblog', element: <JobLogResultPage /> },
-        {
-          path: 'joblog/:id/details',
-          element: <JobDetailsPage />,
-        },
-        { path: 'requestlog', element: <RequestLogResultPage /> },
-        { path: 'settings', element: <SettingPage /> },
-      ],
-    },
-    {
-      path: 'login',
-      element: <LoginPage />,
-    },
-    {
-      element: <SimpleLayout />,
-      children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
-        { path: '404', element: <Page404 /> },
-        { path: '*', element: <Navigate to="/404" /> },
-      ],
-    },
-    {
-      path: '*',
-      element: <Navigate to="/404" replace />,
-    },
-
-  ]);
-
-  return routes;
-}
+const router = createBrowserRouter([
+  {
+    element: <AppLayout />,
+    children: [
+      {
+        path: '/',
+        id: 'root',
+        element: <SimpleLayout />,
+        children: [
+          {
+            path: '/dashboard',
+            element: <DashboardLayout />,
+            children: [
+              { element: <Navigate to="/dashboard/app" />, index: true },
+              { path: 'app', element: <UserPage /> },
+              {
+                path: 'user',
+                element: <UserPage />,
+              },
+              { path: 'timetable', element: <TimeTablePage /> },
+              {
+                path: 'user/:id/details',
+                element: <StudentDetailsPage />,
+              },
+              { path: 'joblog', element: <JobLogResultPage /> },
+              {
+                path: 'joblog/:id/details',
+                element: <JobDetailsPage />,
+              },
+              { path: 'requestlog', element: <RequestLogResultPage /> },
+              { path: 'settings', element: <SettingPage /> },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: 'login',
+    element: <LoginPage />,
+  },
+  {
+    element: <SimpleLayout />,
+    children: [
+      { element: <Navigate to="/dashboard/app" />, index: true },
+      { path: '404', element: <Page404 /> },
+      { path: '*', element: <Navigate to="/404" /> },
+    ],
+  },
+  {
+    path: '*',
+    element: <Navigate to="/404" replace />,
+  },
+]);
+export default router;

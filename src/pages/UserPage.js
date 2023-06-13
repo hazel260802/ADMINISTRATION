@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useRouteLoaderData, json, redirect, defer, Await } from 'react-router-dom';
 import { useState } from 'react';
 // @mui
 import {
@@ -8,12 +8,8 @@ import {
   Table,
   Stack,
   Paper,
-  Avatar,
   Button,
-  Popover,
-  Checkbox,
   TableRow,
-  MenuItem,
   TableBody,
   TableCell,
   Container,
@@ -21,7 +17,7 @@ import {
   IconButton,
   TableContainer,
   TablePagination,
-  Link
+  Link,
 } from '@mui/material';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
@@ -162,7 +158,14 @@ export default function UserPage() {
           <Typography variant="h4" gutterBottom>
             Student List
           </Typography>
-          <Button component={RouterLink} to={`/dashboard/settings`} variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
+          <Button
+            component={RouterLink}
+            to={`/dashboard/settings`}
+            variant="contained"
+            size="medium"
+            color="secondary"
+            startIcon={<ManageAccountsIcon />}
+          >
             Settings
           </Button>
         </Stack>
@@ -188,7 +191,6 @@ export default function UserPage() {
 
                     return (
                       <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedUser}>
-
                         <TableCell align="left">{no}</TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
@@ -206,15 +208,18 @@ export default function UserPage() {
                         <TableCell align="left">{school}</TableCell>
 
                         <TableCell align="center">
-                          <Link component={RouterLink} to={`/dashboard/user/${studentId}/details`} variant="subtitle2" underline="hover">
+                          <Link
+                            component={RouterLink}
+                            to={`/dashboard/user/${studentId}/details`}
+                            variant="subtitle2"
+                            underline="hover"
+                          >
                             <IconButton size="large" color="inherit">
                               <Iconify icon={'fluent:open-16-filled'} />
                             </IconButton>
                           </Link>
                         </TableCell>
-
                       </TableRow>
-                      
                     );
                   })}
                   {emptyRows > 0 && (
@@ -261,10 +266,10 @@ export default function UserPage() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
-        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: '20px'}}>
-        <Button variant="contained" size="large" color = "primary" startIcon={<SummarizeIcon />}>
-          Quantity: {quantity}
-        </Button>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <Button variant="contained" size="large" color="primary" startIcon={<SummarizeIcon />}>
+            Quantity: {quantity}
+          </Button>
         </div>
       </Container>
     </>

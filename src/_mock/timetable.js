@@ -1,6 +1,4 @@
 import { faker } from '@faker-js/faker';
-import { sample } from 'lodash';
-
 // ----------------------------------------------------------------------
 
 const timetable = [...Array(24)].map((_, index) => ({

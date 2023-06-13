@@ -1,7 +1,5 @@
-import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
 import { filter } from 'lodash';
-import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import {
   Card,
@@ -10,23 +8,16 @@ import {
   Typography,
   TableContainer,
   TablePagination,
-  Link,
-  IconButton,
   Paper,
   TableRow,
   TableBody,
   TableCell,
   Container,
-  Button
 } from '@mui/material';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-import SummarizeIcon from '@mui/icons-material/Summarize';
 // components
-import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 // sections
-import { UserListHead, UserListToolbar } from '../user';
-
+import { UserListHead } from '../user';
 
 // ----------------------------------------------------------------------
 
@@ -72,7 +63,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function StudentGPATable({data}) {
+export default function StudentGPATable({ data }) {
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -165,12 +156,20 @@ export default function StudentGPATable({data}) {
                 />
                 <TableBody>
                   {filteredDetails.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { termId, subjectId, subjectName, subjectVolume, classId, midtermGrade, finalGrade, letterGrade } = row;
+                    const {
+                      termId,
+                      subjectId,
+                      subjectName,
+                      subjectVolume,
+                      classId,
+                      midtermGrade,
+                      finalGrade,
+                      letterGrade,
+                    } = row;
                     const selectedUser = selected.indexOf(termId) !== -1;
 
                     return (
                       <TableRow hover key={termId} tabIndex={-1} role="checkbox" selected={selectedUser}>
-
                         <TableCell align="left">{termId}</TableCell>
 
                         <TableCell align="left">{subjectId}</TableCell>
@@ -193,7 +192,6 @@ export default function StudentGPATable({data}) {
 
                         <TableCell align="left">{letterGrade}</TableCell>
                       </TableRow>
-                      
                     );
                   })}
                   {emptyRows > 0 && (

@@ -1,9 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { sample } from 'lodash';
-
 // ----------------------------------------------------------------------
 
-const subjectdata = [...Array(5)].map((_, index) => ({
+const subjectdata = [...Array(5)].map(() => ({
   termId: faker.datatype.number(20203),
   subjectId: faker.datatype.number(20203),
   subjectName: sample(['Math', 'Science', 'History', 'English']),
