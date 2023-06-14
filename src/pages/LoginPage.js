@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { styled } from '@mui/material/styles';
-import { Link, Container, Typography } from '@mui/material';
+import { Container, Typography } from '@mui/material';
 import useResponsive from '../hooks/useResponsive';
 import Logo from '../components/logo';
 import Iconify from '../components/iconify';
@@ -43,7 +43,7 @@ export default function LoginPage() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/${mode}`, {
+      const response = await fetch(`${process.env.domain}/api/${mode}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
