@@ -8,31 +8,37 @@ import TimeTablePage from './pages/TimeTablePage';
 import UserPage from './pages/UserPage';
 import JobLogResultPage from './pages/JobLogResultPage';
 import RequestLogResultPage from './pages/RequestLogResultPage';
-import LoginPage from './pages/LoginPage';
+import LoginPage, { action as loginAction } from './pages/LoginPage';
+import { action as logoutAction } from './pages/LogoutPage';
 import Page404 from './pages/Page404';
 import StudentDetailsPage from './pages/StudentDetailsPage';
-import DashboardAppPage from './pages/DashboardAppPage';
+// import DashboardAppPage from './pages/DashboardAppPage';
 import JobDetailsPage from './pages/JobDetailsPage';
 import SettingPage from './pages/SettingPage';
+import ErrorPage from './pages/ErrorPage';
+
+import { checkAuthLoader, tokenLoader } from './utils/auth';
 
 // ----------------------------------------------------------------------
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
+    errorElement: <Navigate to="/500" />,
     children: [
       {
         path: '/',
         id: 'root',
+        loader: tokenLoader,
         element: <SimpleLayout />,
         children: [
           {
-            path: '/dashboard',
+            path: 'dashboard',
             element: <DashboardLayout />,
+            loader: checkAuthLoader,
             children: [
-              { element: <Navigate to="/dashboard/app" />, index: true },
-              { path: 'app', element: <UserPage /> },
               {
                 path: 'user',
+                index: true,
                 element: <UserPage />,
               },
               { path: 'timetable', element: <TimeTablePage /> },
@@ -52,14 +58,22 @@ const router = createBrowserRouter([
           {
             path: 'login',
             element: <LoginPage />,
+            action: loginAction,
           },
           {
-            element: <SimpleLayout />,
+            path: 'logout',
+            action: logoutAction,
+          },
+          {
             children: [
-              { element: <Navigate to="/dashboard/app" />, index: true },
+              { element: <Navigate to="/dashboard/user" />, index: true },
               { path: '404', element: <Page404 /> },
               { path: '*', element: <Navigate to="/404" /> },
             ],
+          },
+          {
+            path: '/500',
+            element: <ErrorPage />,
           },
           {
             path: '*',
