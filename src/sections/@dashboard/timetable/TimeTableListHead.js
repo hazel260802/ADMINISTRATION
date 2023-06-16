@@ -49,6 +49,9 @@ export default function UserListHead({
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
+              sx={{
+                pointerEvents: 'none'
+              }}
               hideSortIcon
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}

@@ -4,7 +4,7 @@ import DashboardLayout from './layouts/dashboard';
 import SimpleLayout from './layouts/simple';
 import { AppLayout } from './App';
 //
-import TimeTablePage from './pages/TimeTablePage';
+import TimeTablePage, { timetableLoader } from './pages/TimeTablePage';
 import UserPage from './pages/UserPage';
 import JobLogResultPage from './pages/JobLogResultPage';
 import RequestLogResultPage from './pages/RequestLogResultPage';
@@ -17,6 +17,7 @@ import JobDetailsPage from './pages/JobDetailsPage';
 import SettingPage from './pages/SettingPage';
 import ErrorPage from './pages/ErrorPage';
 
+// Loader
 import { checkAuthLoader, tokenLoader } from './utils/auth';
 
 // ----------------------------------------------------------------------
@@ -41,7 +42,11 @@ const router = createBrowserRouter([
                 index: true,
                 element: <UserPage />,
               },
-              { path: 'timetable', element: <TimeTablePage /> },
+              { 
+                path: 'timetable', 
+                element: <TimeTablePage />,
+                loader: timetableLoader
+              },
               {
                 path: 'user/:id/details',
                 element: <StudentDetailsPage />,
