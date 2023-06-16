@@ -7,6 +7,7 @@ import Logo from '../components/logo';
 // import Iconify from '../components/iconify';
 import { LoginForm } from '../sections/auth/login';
 import { login as loginService } from '../services/auth';
+import { dotenv } from 'dotenv';
 
 const StyledRoot = styled('div')(({ theme }) => ({
   [theme.breakpoints.up('md')]: {
@@ -37,6 +38,44 @@ const StyledContent = styled('div')(({ theme }) => ({
 export default function LoginPage() {
   const mdUp = useResponsive('up', 'md');
 
+<<<<<<< HEAD
+=======
+  async function handleFormSubmit(data) {
+    const mode = data.mode || 'login';
+
+    if (mode !== 'login' && mode !== 'signup') {
+      throw new Error('Unsupported mode.');
+    }
+
+    try {
+      const response = await fetch(`${process.dotenv.domain}/api/${mode}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Could not authenticate user.');
+      }
+
+      const resData = await response.json();
+      const token = resData.token;
+
+      localStorage.setItem('token', token);
+      const expiration = new Date();
+      expiration.setHours(expiration.getHours() + 1);
+      localStorage.setItem('expiration', expiration.toISOString());
+
+      // Redirect using client-side navigation after successful authentication
+      window.location.href = '/';  // Replace with your desired URL
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+>>>>>>> 624ea78 (Update)
   return (
     <>
       <Helmet>
