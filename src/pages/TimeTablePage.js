@@ -17,7 +17,7 @@ import {
   TableContainer,
   TablePagination,
   IconButton,
-  Link
+  Link,
 } from '@mui/material';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import SummarizeIcon from '@mui/icons-material/Summarize';
@@ -30,7 +30,6 @@ import { TimeTableListHead, TimeTableListToolbar } from '../sections/@dashboard/
 // mock
 import TIMETABLELIST from '../_mock/timetable';
 import JOBDETAILS from '../_mock/jobdetails';
-
 
 // ----------------------------------------------------------------------
 
@@ -88,8 +87,7 @@ export default function TimeTablePage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const [quantity, setQuantity] = useState(10);  
-
+  const [quantity, setQuantity] = useState(10);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -160,13 +158,14 @@ export default function TimeTablePage() {
           <Typography variant="h4" gutterBottom>
             TimeTable
           </Typography>
-          <Button component={RouterLink} to={`/dashboard/settings`}  variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
-            Settings
-          </Button>
         </Stack>
 
         <Card>
-          <TimeTableListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <TimeTableListToolbar
+            numSelected={selected.length}
+            filterName={filterName}
+            onFilterName={handleFilterByName}
+          />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -182,12 +181,11 @@ export default function TimeTablePage() {
                 />
                 <TableBody>
                   {filteredTimeTable.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, studentId, jobId, termId} = row;
+                    const { no, studentId, jobId, termId } = row;
                     const selectedTimeTable = selected.indexOf(studentId) !== -1;
 
                     return (
                       <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedTimeTable}>
-
                         <TableCell align="left">{no}</TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
@@ -203,15 +201,18 @@ export default function TimeTablePage() {
                         <TableCell align="left">{jobId}</TableCell>
 
                         <TableCell align="left">
-                          <Link component={RouterLink} to={`/dashboard/joblog/${jobId}/details`} variant="subtitle2" underline="hover">
+                          <Link
+                            component={RouterLink}
+                            to={`/dashboard/joblog/${jobId}/details`}
+                            variant="subtitle2"
+                            underline="hover"
+                          >
                             <IconButton size="large" color="inherit">
                               <Iconify icon={'fluent:open-16-filled'} />
                             </IconButton>
                           </Link>
                         </TableCell>
-
                       </TableRow>
-                      
                     );
                   })}
                   {emptyRows > 0 && (
@@ -259,8 +260,8 @@ export default function TimeTablePage() {
           />
         </Card>
 
-        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: '20px'}}>
-          <Button variant="contained" size="large" color = "primary" startIcon={<SummarizeIcon />}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <Button variant="contained" size="large" color="primary" startIcon={<SummarizeIcon />}>
             Quantity: {quantity}
           </Button>
         </div>

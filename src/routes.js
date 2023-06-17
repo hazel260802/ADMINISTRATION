@@ -14,7 +14,7 @@ import Page404 from './pages/Page404';
 import StudentDetailsPage from './pages/StudentDetailsPage';
 // import DashboardAppPage from './pages/DashboardAppPage';
 import JobDetailsPage from './pages/JobDetailsPage';
-import SettingPage from './pages/SettingPage';
+import SettingPage, { loader as settingsLoader, jobCycleAction, dkhptdTimeAction } from './pages/SettingPage';
 import ErrorPage from './pages/ErrorPage';
 
 import { checkAuthLoader, tokenLoader } from './utils/auth';
@@ -52,7 +52,26 @@ const router = createBrowserRouter([
                 element: <JobDetailsPage />,
               },
               { path: 'requestlog', element: <RequestLogResultPage /> },
-              { path: 'settings', element: <SettingPage /> },
+              {
+                path: 'settings',
+                children: [
+                  {
+                    index: true,
+                    element: <SettingPage />,
+                    loader: settingsLoader,
+                  },
+                  {
+                    path: 'job-cycle',
+                    element: <Navigate to="/dashboard/settings" replace />,
+                    action: jobCycleAction,
+                  },
+                  {
+                    path: 'dkhptd-time',
+                    element: <Navigate to="/dashboard/settings" replace />,
+                    action: dkhptdTimeAction,
+                  },
+                ],
+              },
             ],
           },
           {

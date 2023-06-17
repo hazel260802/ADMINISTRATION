@@ -18,10 +18,10 @@ import {
   TableBody,
   TableCell,
   Container,
-  Button, 
+  Button,
   Tabs,
-  Tab, 
-  Box
+  Tab,
+  Box,
 } from '@mui/material';
 import { Router } from '@mui/icons-material';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
@@ -31,14 +31,12 @@ import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
-import {JobDetailTable, JobResultTable} from '../sections/@dashboard/jobdetails'
+import { JobDetailTable, JobResultTable } from '../sections/@dashboard/jobdetails';
 // mock
 import JOBDETAILS from '../_mock/jobdetails';
 import LOGRESULTS from '../_mock/logdetails';
 
-
 // ----------------------------------------------------------------------
-
 
 const tabs = [
   { id: 'job', label: 'Job Log Details', component: JobDetailTable, data: JOBDETAILS },
@@ -91,9 +89,8 @@ function TabPanel({ children, value, index }) {
   return <div hidden={value !== index}>{children}</div>;
 }
 export default function StudentDetailsPage() {
-
   const { id } = useParams();
-  
+
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -116,8 +113,6 @@ export default function StudentDetailsPage() {
     setValue(newValue);
   };
 
-
-
   return (
     <>
       <Helmet>
@@ -129,9 +124,6 @@ export default function StudentDetailsPage() {
           <Typography variant="h4" gutterBottom>
             Job Details
           </Typography>
-          <Button component={RouterLink} to={`/dashboard/settings`}  variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
-            Settings
-          </Button>
         </Stack>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Box
@@ -161,12 +153,12 @@ export default function StudentDetailsPage() {
               mt: 3,
             }}
           >
-              {tabs.map((tab) => (
-                <TabPanel key={tab.id} value={value} index={tab.id}>
-                  {value === tab.id && <tab.component id={id} data ={tab.data}/>}
-                </TabPanel>
-              ))}
-            </Box>
+            {tabs.map((tab) => (
+              <TabPanel key={tab.id} value={value} index={tab.id}>
+                {value === tab.id && <tab.component id={id} data={tab.data} />}
+              </TabPanel>
+            ))}
+          </Box>
         </Box>
       </Container>
     </>

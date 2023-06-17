@@ -18,10 +18,10 @@ import {
   TableBody,
   TableCell,
   Container,
-  Button, 
+  Button,
   Tabs,
-  Tab, 
-  Box
+  Tab,
+  Box,
 } from '@mui/material';
 import { Router } from '@mui/icons-material';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
@@ -31,12 +31,17 @@ import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
-import {StudentGPATable, StudentInfo, StudentLanguageTable, StudentSubjectTable} from '../sections/@dashboard/studentdetails'
+import {
+  StudentGPATable,
+  StudentInfo,
+  StudentLanguageTable,
+  StudentSubjectTable,
+} from '../sections/@dashboard/studentdetails';
 // mock
 import GPA_DATA from '../_mock/gpadata';
 import SUBJECTDATA from '../_mock/subjectdata';
 import LANGUAGEDATA from '../_mock/languagedata';
-import STUDENTDETAILS from '../_mock/studentdetails'
+import STUDENTDETAILS from '../_mock/studentdetails';
 
 // ----------------------------------------------------------------------
 
@@ -105,9 +110,8 @@ function TabPanel({ children, value, index }) {
   return <div hidden={value !== index}>{children}</div>;
 }
 export default function StudentDetailsPage() {
-
   const { id } = useParams();
-  
+
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -199,9 +203,6 @@ export default function StudentDetailsPage() {
           <Typography variant="h4" gutterBottom>
             Student Details
           </Typography>
-          <Button component={RouterLink} to={`/dashboard/settings`}  variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
-            Settings
-          </Button>
         </Stack>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Box
@@ -231,12 +232,12 @@ export default function StudentDetailsPage() {
               mt: 3,
             }}
           >
-              {tabs.map((tab) => (
-                <TabPanel key={tab.id} value={value} index={tab.id}>
-                  {value === tab.id && <tab.component id={id} data ={tab.data}/>}
-                </TabPanel>
-              ))}
-            </Box>
+            {tabs.map((tab) => (
+              <TabPanel key={tab.id} value={value} index={tab.id}>
+                {value === tab.id && <tab.component id={id} data={tab.data} />}
+              </TabPanel>
+            ))}
+          </Box>
         </Box>
       </Container>
     </>
