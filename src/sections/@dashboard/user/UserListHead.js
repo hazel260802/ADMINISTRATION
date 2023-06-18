@@ -19,11 +19,8 @@ const visuallyHidden = {
 UserListHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']),
   orderBy: PropTypes.string,
-  rowCount: PropTypes.number,
   headLabel: PropTypes.array,
-  numSelected: PropTypes.number,
   onRequestSort: PropTypes.func,
-  onSelectAllClick: PropTypes.func,
 };
 
 export default function UserListHead({ order, orderBy, headLabel, onRequestSort }) {
@@ -41,6 +38,9 @@ export default function UserListHead({ order, orderBy, headLabel, onRequestSort 
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
+              sx={{
+                pointerEvents: 'none'
+              }}
               hideSortIcon
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}

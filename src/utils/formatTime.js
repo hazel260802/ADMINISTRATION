@@ -25,3 +25,12 @@ export function fToNow(date) {
       })
     : '';
 }
+
+export function fUnixTime(epochs, timeOnly) {
+  const d = new Date(0)
+  d.setUTCSeconds(epochs);
+
+  if (!timeOnly)
+    return fDateTime(d, 'MMM dd yyyy\xa0\xa0-\xa0\xa0HH:mm:ss')
+  return fDateTime(d, 'HH:mm:ss')
+}

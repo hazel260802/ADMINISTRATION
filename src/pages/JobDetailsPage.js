@@ -1,66 +1,46 @@
-import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
-import { filter } from 'lodash';
-import { Link as RouterLink, useParams } from 'react-router-dom';
-import * as React from 'react';
+import PropTypes from 'prop-types'
+import { Helmet } from 'react-helmet-async';
+import { Link as RouterLink, useLoaderData, useParams } from 'react-router-dom';
+
 // @mui
 import {
-  Card,
-  Table,
   Stack,
   Typography,
-  TableContainer,
-  TablePagination,
-  Link,
-  IconButton,
-  Paper,
-  TableRow,
-  TableBody,
-  TableCell,
   Container,
   Button, 
   Tabs,
   Tab, 
   Box
 } from '@mui/material';
-import { Router } from '@mui/icons-material';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-import SummarizeIcon from '@mui/icons-material/Summarize';
-// components
-import Iconify from '../components/iconify';
-import Scrollbar from '../components/scrollbar';
+
 // sections
-import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 import {JobDetailTable, JobResultTable} from '../sections/@dashboard/jobdetails'
-// mock
-import JOBDETAILS from '../_mock/jobdetails';
-import LOGRESULTS from '../_mock/logdetails';
 
-
-// ----------------------------------------------------------------------
-
-
-const tabs = [
-  { id: 'job', label: 'Job Log Details', component: JobDetailTable, data: JOBDETAILS },
-  { id: 'result', label: 'Job Log Results', component: JobResultTable, data: LOGRESULTS },
-];
+// services
+import { getJobDetail, getJobResult } from '../services/jobs';
 
 // ----------------------------------------------------------------------
 
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
+TabPanel.propTypes = {
+  children: PropTypes.object,
+  value: PropTypes.string,
+  index: PropTypes.string
 }
+
+function TabPanel({ children, value, index }) {
+  return <div hidden={value !== index}>{children}</div>;
+}
+
 
 function LinkTab(props) {
   return (
     <Tab
       component="a"
+      sx={{
+        minWidth: 300
+      }}
       onClick={(event) => {
         event.preventDefault();
       }}
@@ -69,54 +49,45 @@ function LinkTab(props) {
   );
 }
 
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
 
-function applySortFilter(array, comparator, query) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
-  }
-  return stabilizedThis.map((el) => el[0]);
-}
-function TabPanel({ children, value, index }) {
-  return <div hidden={value !== index}>{children}</div>;
-}
 export default function StudentDetailsPage() {
 
+  // Loader data
+  const { jobDetail: loadedJobDetail, jobResults: loadedJobResults } = useLoaderData()
+
+  // Params
   const { id } = useParams();
   
-  const [open, setOpen] = useState(null);
+  // Local states
+  const [value, setValue] = useState('job');
+  const [jobDetail, ] = useState(loadedJobDetail)
+  const [jobResults, ] = useState(loadedJobResults)
 
-  const [page, setPage] = useState(0);
+  // Tab configs
+  const tabs = [
+    // Job detail page
+    { 
+      id: 'job', 
+      label: 'Job Detail', 
+      component: JobDetailTable, 
+      jobId: id,
+      data: jobDetail 
+    },
+    // Job result page
+    { 
+      id: 'result', 
+      label: 'Job Result', 
+      component: JobResultTable, 
+      jobId: id,
+      data: jobResults 
+    },
+  ];
 
-  const [order, setOrder] = useState('asc');
-
-  const [selected, setSelected] = useState([]);
-
-  const [orderBy, setOrderBy] = useState('name');
-
-  const [filterName, setFilterName] = useState('');
-
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  const [quantity, setQuantity] = useState(10);
-
-  const [value, setValue] = React.useState('job');
-
+  // Handlers
+  // Tab change
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
-
 
   return (
     <>
@@ -133,13 +104,13 @@ export default function StudentDetailsPage() {
             Settings
           </Button>
         </Stack>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
           <Box
             sx={{
               display: 'flex',
               justifyContent: 'space-evenly',
               bgcolor: 'background.paper',
-              width: '95%',
+              width: '100%',
             }}
           >
             <Tabs
@@ -163,7 +134,7 @@ export default function StudentDetailsPage() {
           >
               {tabs.map((tab) => (
                 <TabPanel key={tab.id} value={value} index={tab.id}>
-                  {value === tab.id && <tab.component id={id} data ={tab.data}/>}
+                  {value === tab.id && <tab.component id={id} jobId={tab.jobId} data={tab.data}/>}
                 </TabPanel>
               ))}
             </Box>
@@ -171,4 +142,40 @@ export default function StudentDetailsPage() {
       </Container>
     </>
   );
+}
+
+export async function jobDetailLoader ({ params }){
+
+  const jobId = params.id
+  console.log(`Job ID: ${jobId}`)
+
+  // Get job details
+  console.log('Loading job detail...')
+  const jobDetailResponse = await getJobDetail(jobId)
+
+  const jobDetailData = await(jobDetailResponse.json())
+
+  if (!jobDetailResponse.ok) {
+    console.log(`Error code: ${jobDetailResponse.status}`)
+    console.log(`Error message: ${jobDetailData.message}`)
+  }
+
+  const jobDetail = jobDetailData.data
+  console.log(`Loaded job detail: ${JSON.stringify(jobDetail)}`)
+
+  // get job results
+  console.log('Loading job result...')
+  const jobResultResponse = await getJobResult(jobId)
+
+  const jobResultData = await(jobResultResponse.json())
+
+  if (!jobResultResponse.ok) {
+    console.log(`Error code: ${jobResultResponse.status}`)
+    console.log(`Error message: ${jobResultData.message}`)
+  }
+
+  const jobResults = jobResultData.data
+  console.log(`Loaded job results: ${JSON.stringify(jobResults)}`)
+
+  return { jobDetail, jobResults }
 }

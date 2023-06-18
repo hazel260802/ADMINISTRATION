@@ -1,15 +1,8 @@
-import { redirect } from 'react-router-dom';
 import { getAuthToken } from '../utils/auth';
 import cfg from '../configs';
 
 export async function getJobs({ studentId, termId, page, size }) {
-  // console.log(JSON.stringify({ studentId, termId, page, size }));
   const token = getAuthToken()
-
-  if (!token){
-    console.log('Unauthorized!')
-    return redirect('/')
-  }
 
   const params = new URLSearchParams()
   
@@ -28,14 +21,46 @@ export async function getJobs({ studentId, termId, page, size }) {
   return response
 }
 
+
+export async function getJobDetail(jobId){
+  const token = getAuthToken()
+
+  try{
+    const response = await fetch(`${cfg.API_SERVER}/api/log/job/dkhptdv1/${jobId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    return response
+
+  } catch (error) {
+    console.log(`Error message: ${  error.message}`)
+    return null
+  }
+}
+
+
+export async function getJobResult(jobId){
+
+  const token = getAuthToken()
+  const params = new URLSearchParams({ jobId })
+
+  const response = await fetch(`${cfg.API_SERVER}/api/log/job-result/dkhptdv1?${params}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+  });
+
+  return response
+}
+
+
 export async function getSemesters() {
 
   const token = getAuthToken()
-
-  if (!token){
-    console.log('Unauthorized!')
-    return redirect('/')
-  }
 
   const response = await fetch(`${cfg.API_SERVER}/api/term-ids`, {
     method: 'GET',

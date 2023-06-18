@@ -13,7 +13,7 @@ import { action as logoutAction } from './pages/LogoutPage';
 import Page404 from './pages/Page404';
 import StudentDetailsPage from './pages/StudentDetailsPage';
 // import DashboardAppPage from './pages/DashboardAppPage';
-import JobDetailsPage from './pages/JobDetailsPage';
+import JobDetailsPage, { jobDetailLoader } from './pages/JobDetailsPage';
 import SettingPage from './pages/SettingPage';
 import ErrorPage from './pages/ErrorPage';
 
@@ -55,6 +55,7 @@ const router = createBrowserRouter([
               {
                 path: 'joblog/:id/details',
                 element: <JobDetailsPage />,
+                loader: jobDetailLoader
               },
               { path: 'requestlog', element: <RequestLogResultPage /> },
               { path: 'settings', element: <SettingPage /> },

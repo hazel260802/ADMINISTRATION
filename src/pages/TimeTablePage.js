@@ -305,12 +305,14 @@ export default function TimeTablePage() {
 export async function timetableLoader(){
   // Get semester list
   const semesterResponse = await getSemesters()
-  if (!semesterResponse.ok) {
-    console.log(`Error code: ${semesterResponse.status}`)
-    throw Error('Fail to get semester list!')
-  }
 
   const semesterData = await(semesterResponse.json())
+
+  if (!semesterResponse.ok) {
+    console.log(`Error code: ${semesterResponse.status}`)
+    console.log(`Error message: ${semesterData.message}`)
+  }
+
   const semesterList = semesterData.data.sort().reverse() // sort semester
   console.log(`Loaded semesters: ${JSON.stringify(semesterList)}`)
 
@@ -323,11 +325,13 @@ export async function timetableLoader(){
     size: 10
   })
 
+  const jobsData = await (jobResponse.json())
+
   if (!jobResponse.ok) {
     console.log(`Error code: ${jobResponse.status}`)
-    throw Error('Fail to get job list!')
+    console.log(`Error message: ${jobsData.message}`)
   }
-  const jobsData = await (jobResponse.json())
+
   const { DKHPTDJobV1List: jobList, quantity: jobQuantity } = jobsData.data
 
   console.log(`Loaded job list: ${JSON.stringify(jobList)}`)
