@@ -17,7 +17,7 @@ import {
   TableContainer,
   TablePagination,
   Link,
-  IconButton
+  IconButton,
 } from '@mui/material';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 // components
@@ -156,9 +156,6 @@ export default function JobLogPage() {
           <Typography variant="h4" gutterBottom>
             Job Log Result
           </Typography>
-          <Button component={RouterLink} to={`/dashboard/settings`}  variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
-            Settings
-          </Button>
         </Stack>
 
         <Card>
@@ -178,12 +175,11 @@ export default function JobLogPage() {
                 />
                 <TableBody>
                   {filteredJobLog.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, studentId, jobId, method, url, status} = row;
+                    const { no, studentId, jobId, method, url, status } = row;
                     const selectedJobLog = selected.indexOf(studentId) !== -1;
 
                     return (
                       <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedJobLog}>
-
                         <TableCell align="left">{no}</TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
@@ -203,15 +199,18 @@ export default function JobLogPage() {
                         <TableCell align="left">{status}</TableCell>
 
                         <TableCell align="center">
-                          <Link component={RouterLink} to={`/dashboard/joblog/${jobId}/details`} variant="subtitle2" underline="hover">
+                          <Link
+                            component={RouterLink}
+                            to={`/dashboard/joblog/${jobId}/details`}
+                            variant="subtitle2"
+                            underline="hover"
+                          >
                             <IconButton size="large" color="inherit">
                               <Iconify icon={'fluent:open-16-filled'} />
                             </IconButton>
                           </Link>
                         </TableCell>
-
                       </TableRow>
-                      
                     );
                   })}
                   {emptyRows > 0 && (

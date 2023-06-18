@@ -158,16 +158,6 @@ export default function UserPage() {
           <Typography variant="h4" gutterBottom>
             Student List
           </Typography>
-          <Button
-            component={RouterLink}
-            to={`/dashboard/settings`}
-            variant="contained"
-            size="medium"
-            color="secondary"
-            startIcon={<ManageAccountsIcon />}
-          >
-            Settings
-          </Button>
         </Stack>
         <Card>
           <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
