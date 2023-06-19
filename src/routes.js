@@ -14,7 +14,7 @@ import Page404 from './pages/Page404';
 import StudentDetailsPage from './pages/StudentDetailsPage';
 // import DashboardAppPage from './pages/DashboardAppPage';
 import JobDetailsPage, { jobDetailLoader } from './pages/JobDetailsPage';
-import SettingPage from './pages/SettingPage';
+import SettingPage, { loader as settingsLoader, jobCycleAction, dkhptdTimeAction } from './pages/SettingPage';
 import ErrorPage from './pages/ErrorPage';
 
 // Loader
@@ -42,10 +42,10 @@ const router = createBrowserRouter([
                 index: true,
                 element: <UserPage />,
               },
-              { 
-                path: 'timetable', 
+              {
+                path: 'timetable',
                 element: <TimeTablePage />,
-                loader: timetableLoader
+                loader: timetableLoader,
               },
               {
                 path: 'user/:id/details',
@@ -55,10 +55,29 @@ const router = createBrowserRouter([
               {
                 path: 'joblog/:id/details',
                 element: <JobDetailsPage />,
-                loader: jobDetailLoader
+                loader: jobDetailLoader,
               },
               { path: 'requestlog', element: <RequestLogResultPage /> },
-              { path: 'settings', element: <SettingPage /> },
+              {
+                path: 'settings',
+                children: [
+                  {
+                    index: true,
+                    element: <SettingPage />,
+                    loader: settingsLoader,
+                  },
+                  {
+                    path: 'job-cycle',
+                    element: <Navigate to="/dashboard/settings" replace />,
+                    action: jobCycleAction,
+                  },
+                  {
+                    path: 'dkhptd-time',
+                    element: <Navigate to="/dashboard/settings" replace />,
+                    action: dkhptdTimeAction,
+                  },
+                ],
+              },
             ],
           },
           {

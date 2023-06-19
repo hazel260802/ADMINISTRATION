@@ -10,7 +10,7 @@ import Iconify from '../../../components/iconify';
 
 export default function LoginForm() {
   const data = useActionData();
-  console.log(data);
+
   const navigation = useNavigation();
 
   const [showPassword, setShowPassword] = useState(false);

@@ -17,7 +17,7 @@ import {
   TableContainer,
   TablePagination,
   IconButton,
-  Link
+  Link,
 } from '@mui/material';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import SummarizeIcon from '@mui/icons-material/Summarize';
@@ -45,32 +45,27 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 export default function TimeTablePage() {
-
   // Get loader data
-  const loaderData = useLoaderData()
-  const { 
-    jobList: loadedJobList, 
-    jobQuantity: loadedJobQuantity, 
-    semesterList: loadedSemesterList
-  } = loaderData
+  const loaderData = useLoaderData();
+  const { jobList: loadedJobList, jobQuantity: loadedJobQuantity, semesterList: loadedSemesterList } = loaderData;
 
   // Local states
   const [page, setPage] = useState(0);
-  const [order, ] = useState('asc');
-  const [selected, ] = useState([]);
-  const [orderBy, ] = useState('name');
+  const [order] = useState('asc');
+  const [selected] = useState([]);
+  const [orderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   // Custom states
-  const [jobList, setJobList] = useState(loadedJobList)
-  const [jobQuantity, setJobQuantity] = useState(loadedJobQuantity)
-  const [semesterList, ] = useState(loadedSemesterList)
-  const [currentSemester, setCurrentSemester] = useState(semesterList.length > 0 ? semesterList[0] : 'None')
+  const [jobList, setJobList] = useState(loadedJobList);
+  const [jobQuantity, setJobQuantity] = useState(loadedJobQuantity);
+  const [semesterList] = useState(loadedSemesterList);
+  const [currentSemester, setCurrentSemester] = useState(semesterList.length > 0 ? semesterList[0] : 'None');
 
   // Params
   const isNotFound = !jobList.length && !!filterName;
-  const noData = !jobList.length && !filterName
+  const noData = !jobList.length && !filterName;
 
   // Update current job list
   const updateJobList = async (studentId, termId, page, size) => {
@@ -78,71 +73,71 @@ export default function TimeTablePage() {
       studentId,
       termId,
       page,
-      size
-    })
+      size,
+    });
 
-    if (!response.ok) throw Error('Fail to filter data!')
+    if (!response.ok) throw Error('Fail to filter data!');
 
-    const newJobData = await response.json()
-    const { DKHPTDJobV1List: newJobList, quantity: newJobQuantity } = newJobData.data
+    const newJobData = await response.json();
+    const { DKHPTDJobV1List: newJobList, quantity: newJobQuantity } = newJobData.data;
 
-    console.log(`New job list: ${  JSON.stringify(newJobList)}`)
-    console.log(`New job quantity: ${  JSON.stringify(newJobQuantity)}`)
+    console.log(`New job list: ${JSON.stringify(newJobList)}`);
+    console.log(`New job quantity: ${JSON.stringify(newJobQuantity)}`);
 
     // Change local states
-    setJobList(newJobList)
-    setJobQuantity(newJobQuantity)
-  }
+    setJobList(newJobList);
+    setJobQuantity(newJobQuantity);
+  };
 
   // Change semester
   const handleFilterSemester = async (semester) => {
-    setCurrentSemester(semester)
-    console.log(`Change semester to ${semester}`)
+    setCurrentSemester(semester);
+    console.log(`Change semester to ${semester}`);
 
     // Reset data
-    await updateJobList(null, semester, 1, rowsPerPage)
+    await updateJobList(null, semester, 1, rowsPerPage);
 
     // Back to page 1
-    setPage(0)
-    setFilterName('')
-  }
+    setPage(0);
+    setFilterName('');
+  };
 
   // Change page
   const handleChangePage = async (event, newPage) => {
-    console.log(`Jump to page ${newPage}`)
+    console.log(`Jump to page ${newPage}`);
 
     // Reset data
-    await updateJobList(null, currentSemester, newPage + 1, rowsPerPage)
+    await updateJobList(null, currentSemester, newPage + 1, rowsPerPage);
 
     // Change page
     setPage(newPage);
-    setFilterName('')
+    setFilterName('');
   };
 
   // Change row per page
   const handleChangeRowsPerPage = async (event) => {
-    const newRowPerPage = parseInt(event.target.value, 10)
+    const newRowPerPage = parseInt(event.target.value, 10);
 
     // Reset data
-    await updateJobList(null, currentSemester, 1, newRowPerPage)
+    await updateJobList(null, currentSemester, 1, newRowPerPage);
 
     // Back to page 1
-    setPage(0)
+    setPage(0);
     setRowsPerPage(newRowPerPage);
-    setFilterName('')
+    setFilterName('');
   };
 
   const handleSearchSubmit = async (event) => {
     if (event.key === 'Enter') {
-      console.log(`Enter pressed. Search for ${filterName}!`)
+      console.log(`Enter pressed. Search for ${filterName}!`);
 
       // Update job list
-      await updateJobList(filterName === ''? null : filterName, currentSemester, 1, rowsPerPage)
+      await updateJobList(filterName === '' ? null : filterName, currentSemester, 1, rowsPerPage);
 
       // Back to page 1
-      setPage(0)
+      setPage(0);
     }
-  }
+  };
 
   return (
     <>
@@ -155,21 +150,18 @@ export default function TimeTablePage() {
           <Typography variant="h4" gutterBottom>
             TimeTable
           </Typography>
-          <Button component={RouterLink} to={`/dashboard/settings`}  variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
-            Settings
-          </Button>
         </Stack>
 
         <Card>
-          <TimeTableListToolbar 
+          <TimeTableListToolbar
             semesterList={semesterList}
-            currentSemester={currentSemester} 
-            handleFilterSemester={handleFilterSemester} 
-            numSelected={selected.length} 
-            filterName={filterName} 
+            currentSemester={currentSemester}
+            handleFilterSemester={handleFilterSemester}
+            numSelected={selected.length}
+            filterName={filterName}
             onFilterName={(event) => {
-              setFilterName(event.target.value)
-            }} 
+              setFilterName(event.target.value);
+            }}
             onSubmit={handleSearchSubmit}
           />
 
@@ -187,13 +179,12 @@ export default function TimeTablePage() {
                 />
                 <TableBody>
                   {jobList.map((row, index) => {
-                    const no = page * rowsPerPage + index + 1
-                    const { username : studentId, _id : jobId, termId} = row;
+                    const no = page * rowsPerPage + index + 1;
+                    const { username: studentId, _id: jobId, termId } = row;
                     const selectedTimeTable = selected.indexOf(studentId) !== -1;
 
                     return (
                       <TableRow hover key={jobId} tabIndex={-1} role="checkbox" selected={selectedTimeTable}>
-
                         <TableCell align="left">{no}</TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
@@ -209,15 +200,18 @@ export default function TimeTablePage() {
                         <TableCell align="left">{jobId}</TableCell>
 
                         <TableCell align="left">
-                          <Link component={RouterLink} to={`/dashboard/joblog/${jobId}/details`} variant="subtitle2" underline="hover">
+                          <Link
+                            component={RouterLink}
+                            to={`/dashboard/joblog/${jobId}/details`}
+                            variant="subtitle2"
+                            underline="hover"
+                          >
                             <IconButton size="large" color="inherit">
                               <Iconify icon={'fluent:open-16-filled'} />
                             </IconButton>
                           </Link>
                         </TableCell>
-
                       </TableRow>
-                      
                     );
                   })}
                 </TableBody>
@@ -284,14 +278,14 @@ export default function TimeTablePage() {
           />
         </Card>
 
-        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: '20px'}}>
-          <Button 
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <Button
             sx={{
-              pointerEvents: 'none'
-            }} 
-            variant="contained" 
-            size="large" 
-            color = "primary" 
+              pointerEvents: 'none',
+            }}
+            variant="contained"
+            size="large"
+            color="primary"
             startIcon={<SummarizeIcon />}
           >
             Quantity: {jobQuantity}
@@ -302,40 +296,40 @@ export default function TimeTablePage() {
   );
 }
 
-export async function timetableLoader(){
+export async function timetableLoader() {
   // Get semester list
-  const semesterResponse = await getSemesters()
+  const semesterResponse = await getSemesters();
 
-  const semesterData = await(semesterResponse.json())
+  const semesterData = await semesterResponse.json();
 
   if (!semesterResponse.ok) {
-    console.log(`Error code: ${semesterResponse.status}`)
-    console.log(`Error message: ${semesterData.message}`)
+    console.log(`Error code: ${semesterResponse.status}`);
+    console.log(`Error message: ${semesterData.message}`);
   }
 
-  const semesterList = semesterData.data.sort().reverse() // sort semester
-  console.log(`Loaded semesters: ${JSON.stringify(semesterList)}`)
+  const semesterList = semesterData.data.sort().reverse(); // sort semester
+  console.log(`Loaded semesters: ${JSON.stringify(semesterList)}`);
 
   // Sort semesters
-  const latestSemester = semesterList[0]
+  const latestSemester = semesterList[0];
   const jobResponse = await getJobs({
     studentId: null,
     termId: latestSemester,
     page: 1,
-    size: 10
-  })
+    size: 10,
+  });
 
-  const jobsData = await (jobResponse.json())
+  const jobsData = await jobResponse.json();
 
   if (!jobResponse.ok) {
-    console.log(`Error code: ${jobResponse.status}`)
-    console.log(`Error message: ${jobsData.message}`)
+    console.log(`Error code: ${jobResponse.status}`);
+    console.log(`Error message: ${jobsData.message}`);
   }
 
-  const { DKHPTDJobV1List: jobList, quantity: jobQuantity } = jobsData.data
+  const { DKHPTDJobV1List: jobList, quantity: jobQuantity } = jobsData.data;
 
-  console.log(`Loaded job list: ${JSON.stringify(jobList)}`)
-  console.log(`Loaded job quantity: ${jobQuantity}`)
+  console.log(`Loaded job list: ${JSON.stringify(jobList)}`);
+  console.log(`Loaded job quantity: ${jobQuantity}`);
 
-  return json({ jobList, jobQuantity, semesterList })
+  return json({ jobList, jobQuantity, semesterList });
 }

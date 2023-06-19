@@ -83,7 +83,6 @@ export default function RequestLogPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -153,9 +152,6 @@ export default function RequestLogPage() {
           <Typography variant="h4" gutterBottom>
             Request Log Result
           </Typography>
-          <Button component={RouterLink} to={`/dashboard/settings`}  variant="contained" size="medium" color ="secondary" startIcon={<ManageAccountsIcon />}>
-            Settings
-          </Button>
         </Stack>
 
         <Card>
@@ -175,12 +171,11 @@ export default function RequestLogPage() {
                 />
                 <TableBody>
                   {filteredJobLog.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, studentId, method, url, status, time, reponseTime} = row;
+                    const { no, studentId, method, url, status, time, reponseTime } = row;
                     const selectedJobLog = selected.indexOf(studentId) !== -1;
 
                     return (
                       <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedJobLog}>
-
                         <TableCell align="left">{no}</TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
@@ -200,9 +195,7 @@ export default function RequestLogPage() {
                         <TableCell align="left">{time.toString()}</TableCell>
 
                         <TableCell align="center">{reponseTime} ms</TableCell>
-
                       </TableRow>
-                      
                     );
                   })}
                   {emptyRows > 0 && (
@@ -250,7 +243,6 @@ export default function RequestLogPage() {
           />
         </Card>
       </Container>
-
     </>
   );
 }

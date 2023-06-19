@@ -36,6 +36,10 @@ export default function AccountPopover() {
     submit(null, { action: '/logout', method: 'post' });
   };
 
+  const handleSettings = () => {
+    submit(null, { action: '/dashboard/settings', method: 'get' });
+  };
+
   return (
     <>
       <IconButton
@@ -89,11 +93,8 @@ export default function AccountPopover() {
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Stack sx={{ p: 1 }}>
-          {MENU_OPTIONS.map((option) => (
-            <MenuItem key={option.label} onClick={handleClose}>
-              {option.label}
-            </MenuItem>
-          ))}
+          <MenuItem onClick={handleClose}>Profile</MenuItem>
+          <MenuItem onClick={handleSettings}>Settings</MenuItem>
         </Stack>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
