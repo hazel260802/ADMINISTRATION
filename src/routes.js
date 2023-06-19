@@ -4,7 +4,7 @@ import DashboardLayout from './layouts/dashboard';
 import SimpleLayout from './layouts/simple';
 import { AppLayout } from './App';
 //
-import TimeTablePage from './pages/TimeTablePage';
+import TimeTablePage, { timetableLoader } from './pages/TimeTablePage';
 import UserPage from './pages/UserPage';
 import JobLogResultPage from './pages/JobLogResultPage';
 import RequestLogResultPage from './pages/RequestLogResultPage';
@@ -13,10 +13,11 @@ import { action as logoutAction } from './pages/LogoutPage';
 import Page404 from './pages/Page404';
 import StudentDetailsPage from './pages/StudentDetailsPage';
 // import DashboardAppPage from './pages/DashboardAppPage';
-import JobDetailsPage from './pages/JobDetailsPage';
+import JobDetailsPage, { jobDetailLoader } from './pages/JobDetailsPage';
 import SettingPage, { loader as settingsLoader, jobCycleAction, dkhptdTimeAction } from './pages/SettingPage';
 import ErrorPage from './pages/ErrorPage';
 
+// Loader
 import { checkAuthLoader, tokenLoader } from './utils/auth';
 
 // ----------------------------------------------------------------------
@@ -41,7 +42,11 @@ const router = createBrowserRouter([
                 index: true,
                 element: <UserPage />,
               },
-              { path: 'timetable', element: <TimeTablePage /> },
+              {
+                path: 'timetable',
+                element: <TimeTablePage />,
+                loader: timetableLoader,
+              },
               {
                 path: 'user/:id/details',
                 element: <StudentDetailsPage />,
@@ -50,6 +55,7 @@ const router = createBrowserRouter([
               {
                 path: 'joblog/:id/details',
                 element: <JobDetailsPage />,
+                loader: jobDetailLoader,
               },
               { path: 'requestlog', element: <RequestLogResultPage /> },
               {
