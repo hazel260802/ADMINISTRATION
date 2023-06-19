@@ -16,11 +16,11 @@ const navConfig = [
     path: '/dashboard/timetable',
     icon: icon('ic_timetable'),
   },
-  {
-    title: 'job log result',
-    path: '/dashboard/joblog',
-    icon: icon('ic_joblog'),
-  },
+  // {
+  //   title: 'job log result',
+  //   path: '/dashboard/joblog',
+  //   icon: icon('ic_joblog'),
+  // },
   {
     title: 'request log result',
     path: '/dashboard/requestlog',
