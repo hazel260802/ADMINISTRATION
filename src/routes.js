@@ -5,18 +5,17 @@ import SimpleLayout from './layouts/simple';
 import { AppLayout } from './App';
 //
 import TimeTablePage, { timetableLoader } from './pages/TimeTablePage';
-import UserPage from './pages/UserPage';
+import UserPage, {loader as studentsLoader} from './pages/UserPage';
 import JobLogResultPage from './pages/JobLogResultPage';
-import RequestLogResultPage from './pages/RequestLogResultPage';
+import RequestLogResultPage, {loader as resquestLogLoader} from './pages/RequestLogResultPage';
 import LoginPage, { action as loginAction } from './pages/LoginPage';
 import { action as logoutAction } from './pages/LogoutPage';
 import Page404 from './pages/Page404';
-import StudentDetailsPage from './pages/StudentDetailsPage';
+import StudentDetailsPage, { loadStudent as studentLoader } from './pages/StudentDetailsPage';
 // import DashboardAppPage from './pages/DashboardAppPage';
 import JobDetailsPage, { jobDetailLoader } from './pages/JobDetailsPage';
 import SettingPage, { loader as settingsLoader, jobCycleAction, dkhptdTimeAction } from './pages/SettingPage';
 import ErrorPage from './pages/ErrorPage';
-
 // Loader
 import { checkAuthLoader, tokenLoader } from './utils/auth';
 
@@ -24,7 +23,7 @@ import { checkAuthLoader, tokenLoader } from './utils/auth';
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
-    errorElement: <Navigate to="/500" />,
+    // errorElement: <Navigate to="/500" />,
     children: [
       {
         path: '/',
@@ -41,15 +40,17 @@ const router = createBrowserRouter([
                 path: 'user',
                 index: true,
                 element: <UserPage />,
+                loader: studentsLoader,
               },
               {
-                path: 'timetable',
-                element: <TimeTablePage />,
-                loader: timetableLoader,
+              path: 'timetable',
+              element: <TimeTablePage />,
+              loader: timetableLoader,
               },
               {
                 path: 'user/:id/details',
                 element: <StudentDetailsPage />,
+                loader: studentLoader,
               },
               { path: 'joblog', element: <JobLogResultPage /> },
               {
@@ -57,7 +58,17 @@ const router = createBrowserRouter([
                 element: <JobDetailsPage />,
                 loader: jobDetailLoader,
               },
-              { path: 'requestlog', element: <RequestLogResultPage /> },
+              { 
+                path: 'requestlog', 
+                element: <RequestLogResultPage />,
+                loader: resquestLogLoader,
+                children: [
+                  {
+                    path: ':username/:page/:size',
+                    index: true,
+                  }
+                ]
+              },
               {
                 path: 'settings',
                 children: [

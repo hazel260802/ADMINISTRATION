@@ -1,7 +1,6 @@
 import { Helmet } from 'react-helmet-async';
-import { filter } from 'lodash';
-import { Link as RouterLink, useRouteLoaderData, json, redirect, defer, Await } from 'react-router-dom';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
+import { Link as RouterLink, useLoaderData, json, defer, Await } from 'react-router-dom';
 // @mui
 import {
   Card,
@@ -26,9 +25,8 @@ import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
-// mock
-import USERLIST from '../_mock/user';
-import STUDENTDETAILS from '../_mock/studentdetails';
+// service
+import { getStudents } from '../services/user';
 
 // ----------------------------------------------------------------------
 
@@ -43,60 +41,122 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function applySortFilter(array, comparator, query) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
-  }
-  return stabilizedThis.map((el) => el[0]);
-}
-
 export default function UserPage() {
-  const [open, setOpen] = useState(null);
+  // Get loader data
+  const { data } = useLoaderData();
+  const { quantity, studentList } = data;
 
+  // Local states
   const [page, setPage] = useState(0);
-
   const [order, setOrder] = useState('asc');
-
   const [selected, setSelected] = useState([]);
-
   const [orderBy, setOrderBy] = useState('name');
-
-  const [filterName, setFilterName] = useState('');
-
+  const [filterCohort, setFilterCohort] = useState('');
+  const [filterStudentId, setFilterStudentId] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const [quantity, setQuantity] = useState(10);
+  // Custom states
+  const [studentFilterList, setStudentList] = useState(studentList);
+  const [studentQuantity, setStudentQuantity] = useState(quantity);
+  const [currentSchool, setCurrentSchool] = useState('');
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  // Params
+  const isNotFound = !studentFilterList.length && !!filterStudentId && !!filterCohort;
+  const noData = !studentFilterList.length && !filterStudentId && !!filterCohort;
+
+  // Update current student list
+  const updateStudentList = async ({ studentId, school, cohort, page, size }) => {
+    const response = await getStudents({ studentId, school, cohort, page, size });
+
+    if (!response.ok) throw Error('Fail to filter data!');
+
+    const newData = await response.json();
+    const { studentList: newStudentList, quantity: newQuantity } = newData.data;
+
+    // Filter the student list based on filterName and filterStudentId
+    const filteredStudentList = newStudentList.filter((student) =>
+      student.studentId.toString().includes(filterStudentId)
+    );
+    console.log(`New student list: ${JSON.stringify(newStudentList)}`);
+    console.log(`New student quantity: ${JSON.stringify(newQuantity)}`);
+
+    // Change local states
+    setStudentList(filteredStudentList);
+    setStudentQuantity(newQuantity);
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  // Change school
+  const handleFilterSchool = async (selectedSchool) => {
+    setCurrentSchool(selectedSchool);
+    console.log(`Change school to ${selectedSchool}`);
+    // Reset data
+    await updateStudentList({
+      studentId: filterStudentId === '' ? '' : filterStudentId,
+      school: selectedSchool,
+      cohort: '',
+      page: 1,
+      size: rowsPerPage,
+    });
+
+    // Back to page 1
+    setPage(0);
+    setFilterStudentId('');
   };
 
+  // Change page
+  const handleChangePage = async (event, newPage) => {
+    console.log(`Jump to page ${newPage}`);
+
+    // Reset data
+    await updateStudentList({
+      studentId: filterStudentId === '' ? '' : filterStudentId,
+      school: currentSchool,
+      cohort: '',
+      page: newPage + 1,
+      size: rowsPerPage,
+    });
+
+    // Change page
+    setPage(newPage);
+    setFilterStudentId('');
+  };
+
+  // Change row per page
+  const handleChangeRowsPerPage = async (event) => {
+    const newRowPerPage = parseInt(event.target.value, 5);
+
+    // Reset data
+    await updateStudentList({
+      studentId: filterStudentId,
+      school: currentSchool,
+      cohort: '',
+      page: 1,
+      size: rowsPerPage,
+    });
+
+    // Back to page 1
+    setPage(0);
+    setRowsPerPage(newRowPerPage);
+    setFilterStudentId('');
+  };
+
+  const handleSearchSubmit = async (event) => {
+    if (event.key === 'Enter') {
+      console.log(`Enter pressed. Search for ${filterCohort}!`);
+
+      // Update student list
+      await updateStudentList({
+        studentId: '',
+        school: currentSchool,
+        cohort: filterCohort,
+        page: 1,
+        size: rowsPerPage,
+      });
+
+      // Back to page 1
+      setPage(0);
+    }
+  };
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -105,47 +165,12 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = studentFilterList.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
-
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
-  };
-
-  const handleFilterByName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
-  };
-
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
-
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
-
-  const isNotFound = !filteredUsers.length && !!filterName;
 
   return (
     <>
@@ -160,7 +185,20 @@ export default function UserPage() {
           </Typography>
         </Stack>
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <UserListToolbar
+            currentSchool={currentSchool}
+            handleFilterSchool={handleFilterSchool}
+            numSelected={selected.length}
+            filterStudentId={filterStudentId}
+            onFilterName={(event) => {
+              setFilterStudentId(event.target.value);
+            }}
+            filterCohort={filterCohort}
+            onFilterCohort={(event) => {
+              setFilterCohort(event.target.value);
+            }}
+            onSubmit={handleSearchSubmit}
+          />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -169,54 +207,54 @@ export default function UserPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={studentFilterList.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, name, studentId, cohort, school } = row;
-                    const selectedUser = selected.indexOf(name) !== -1;
+                  <Suspense fallback={<p style={{ textAlign: 'center' }}>Loading...</p>}>
+                    <Await resolve={studentFilterList}>
+                      {studentFilterList.map((row, index) => {
+                        const no = page * rowsPerPage + index + 1;
+                        const { name, studentId, cohort, school } = row;
+                        const selectedUser = selected.indexOf(name) !== -1;
 
-                    return (
-                      <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedUser}>
-                        <TableCell align="left">{no}</TableCell>
+                        return (
+                          <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                            <TableCell align="left">{no}</TableCell>
 
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2}>
-                            <Typography variant="subtitle2" noWrap>
-                              {name}
-                            </Typography>
-                          </Stack>
-                        </TableCell>
+                            <TableCell component="th" scope="row" padding="none">
+                              <Stack direction="row" alignItems="center" spacing={2}>
+                                <Typography variant="subtitle2" noWrap>
+                                  {name}
+                                </Typography>
+                              </Stack>
+                            </TableCell>
 
-                        <TableCell align="left">{studentId}</TableCell>
+                            <TableCell align="left">{studentId}</TableCell>
 
-                        <TableCell align="left">{cohort}</TableCell>
+                            <TableCell align="left">{cohort}</TableCell>
 
-                        <TableCell align="left">{school}</TableCell>
+                            <TableCell align="left">{school}</TableCell>
 
-                        <TableCell align="center">
-                          <Link
-                            component={RouterLink}
-                            to={`/dashboard/user/${studentId}/details`}
-                            variant="subtitle2"
-                            underline="hover"
-                          >
-                            <IconButton size="large" color="inherit">
-                              <Iconify icon={'fluent:open-16-filled'} />
-                            </IconButton>
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
+                            <TableCell align="left">
+                              <Link
+                                component={RouterLink}
+                                to={`/dashboard/user/${studentId}/details`}
+                                variant="subtitle2"
+                                underline="hover"
+                              >
+                                <IconButton size="large" color="inherit">
+                                  <Iconify icon={'fluent:open-16-filled'} />
+                                </IconButton>
+                              </Link>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </Await>
+                  </Suspense>
                 </TableBody>
 
                 {isNotFound && (
@@ -234,8 +272,31 @@ export default function UserPage() {
 
                           <Typography variant="body2">
                             No results found for &nbsp;
-                            <strong>&quot;{filterName}&quot;</strong>.
+                            <strong>&quot;{filterStudentId}&quot;</strong>.
                             <br /> Try checking for typos or using complete words.
+                          </Typography>
+                        </Paper>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                )}
+                {noData && (
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                        <Paper
+                          sx={{
+                            textAlign: 'center',
+                          }}
+                        >
+                          <Typography variant="h6" paragraph>
+                            Data does not exist!
+                          </Typography>
+
+                          <Typography variant="body2">
+                            No results found for school &nbsp;
+                            <strong>&quot;{currentSchool}&quot;</strong>.
+                            <br /> Try other schools instead.
                           </Typography>
                         </Paper>
                       </TableCell>
@@ -247,9 +308,9 @@ export default function UserPage() {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[5, 10, 15, 20, 25]}
             component="div"
-            count={USERLIST.length}
+            count={studentQuantity}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -258,10 +319,43 @@ export default function UserPage() {
         </Card>
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
           <Button variant="contained" size="large" color="primary" startIcon={<SummarizeIcon />}>
-            Quantity: {quantity}
+            Quantity: {studentQuantity}
           </Button>
         </div>
       </Container>
     </>
   );
+}
+
+async function loadStudents() {
+  const response = await getStudents({
+    studentId: '',
+    school: '',
+    cohort: '',
+    page: 1,
+    size: 5,
+  });
+  console.log(response);
+  if (response.status === 401 || response.status === 400 || response.status === 422) {
+    return response;
+  }
+
+  if (!response.ok) {
+    throw json(
+      { message: 'Could not fetch students.' },
+      {
+        status: 500,
+      }
+    );
+  }
+
+  const resData = await response.json();
+  console.log(resData.data);
+  return resData.data;
+}
+
+export async function loader() {
+  return defer({
+    data: await loadStudents(),
+  });
 }

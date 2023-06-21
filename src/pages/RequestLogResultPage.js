@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
-import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Suspense, useState } from 'react';
+import { Link as RouterLink, useLoaderData, json, defer, Await } from 'react-router-dom';
 // @mui
 import {
   Card,
@@ -22,8 +22,8 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { JobLogListHead, JobLogListToolbar } from '../sections/@dashboard/joblog';
-// mock
-import JOBLOGLIST from '../_mock/joblog';
+// service
+import { getRequestLogs } from '../services/requestlog';
 
 // ----------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ const TABLE_HEAD = [
   { id: 'method', label: 'Method', alignRight: false },
   { id: 'url', label: 'URL', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
-  { id: 'time', label: 'Time', alignRight: false },
+  { id: 'timestamp', label: 'Timestamp', alignRight: false },
   { id: 'responeTime', label: 'Respone Time', alignRight: false },
 ];
 
@@ -69,7 +69,10 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function RequestLogPage() {
-  const [open, setOpen] = useState(null);
+  const { data } = useLoaderData();
+  const { requestLogs } = data;
+  
+  //Local states
 
   const [page, setPage] = useState(0);
 
@@ -83,13 +86,6 @@ export default function RequestLogPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -99,27 +95,13 @@ export default function RequestLogPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = JOBLOGLIST.map((n) => n.name);
+      const newSelecteds = requestLogs.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
-  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -135,9 +117,9 @@ export default function RequestLogPage() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - JOBLOGLIST.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - requestLogs.length) : 0;
 
-  const filteredJobLog = applySortFilter(JOBLOGLIST, getComparator(order, orderBy), filterName);
+  const filteredJobLog = applySortFilter(requestLogs, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredJobLog.length && !!filterName;
 
@@ -152,6 +134,16 @@ export default function RequestLogPage() {
           <Typography variant="h4" gutterBottom>
             Request Log Result
           </Typography>
+          <Button
+            component={RouterLink}
+            to={`/dashboard/settings`}
+            variant="contained"
+            size="medium"
+            color="secondary"
+            startIcon={<ManageAccountsIcon />}
+          >
+            Settings
+          </Button>
         </Stack>
 
         <Card>
@@ -164,45 +156,58 @@ export default function RequestLogPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={JOBLOGLIST.length}
+                  rowCount={requestLogs.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredJobLog.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, studentId, method, url, status, time, reponseTime } = row;
-                    const selectedJobLog = selected.indexOf(studentId) !== -1;
+                  <Suspense fallback={<p style={{ textAlign: 'center' }}>Loading...</p>}>
+                    <Await resolve={requestLogs}>
+                      {(loadedLogJobs) => {
+                        const slicedLogJobs = loadedLogJobs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-                    return (
-                      <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedJobLog}>
-                        <TableCell align="left">{no}</TableCell>
+                        return (
+                          <>
+                            {slicedLogJobs.map((row, index) => {
+                              const no = page * rowsPerPage + index + 1;
+                              const { studentId, method, url, status, timestamp, reponseTime } = row;
+                              const selectedLogJob = selected.indexOf(studentId) !== -1;
 
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" marginLeft={2} spacing={2}>
-                            <Typography variant="subtitle2" noWrap>
-                              {studentId}
-                            </Typography>
-                          </Stack>
-                        </TableCell>
+                              return (
+                                <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedLogJob}>
+                                  <TableCell align="left">{no}</TableCell>
 
-                        <TableCell align="center">{method}</TableCell>
+                                  <TableCell component="th" scope="row" padding="none">
+                                    <Stack direction="row" alignItems="center" marginLeft={2} spacing={2}>
+                                      <Typography variant="subtitle2" noWrap>
+                                        {studentId}
+                                      </Typography>
+                                    </Stack>
+                                  </TableCell>
 
-                        <TableCell align="left">{url}</TableCell>
+                                  <TableCell align="center">{method}</TableCell>
 
-                        <TableCell align="center">{status}</TableCell>
+                                  <TableCell align="left">{url}</TableCell>
 
-                        <TableCell align="left">{time.toString()}</TableCell>
+                                  <TableCell align="center">{status}</TableCell>
 
-                        <TableCell align="center">{reponseTime} ms</TableCell>
-                      </TableRow>
-                    );
-                  })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
+                                  <TableCell align="left">{timestamp.toString()}</TableCell>
+
+                                  <TableCell align="center">{reponseTime} ms</TableCell>
+                                </TableRow>
+                              );
+                            })}
+                            {emptyRows > 0 && (
+                              <TableRow style={{ height: 53 * emptyRows }}>
+                                <TableCell colSpan={6} />
+                              </TableRow>
+                            )}
+                          </>
+                        );
+                      }}
+                    </Await>
+                  </Suspense>
                 </TableBody>
 
                 {isNotFound && (
@@ -235,7 +240,7 @@ export default function RequestLogPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={JOBLOGLIST.length}
+            count={requestLogs.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -245,4 +250,30 @@ export default function RequestLogPage() {
       </Container>
     </>
   );
+}
+async function loadRequestLogs() {
+  const response = await getRequestLogs();
+
+  if (response.status === 401 || response.status === 400 || response.status === 422) {
+    return response;
+  }
+
+  if (!response.ok) {
+    throw json(
+      { message: 'Could not fetch students.' },
+      {
+        status: 500,
+      }
+    );
+  }
+
+  const resData = await response.json();
+  console.log(resData.data);
+  return resData.data;
+}
+
+export async function loader() {
+  return defer({
+    data: await loadRequestLogs(),
+  });
 }

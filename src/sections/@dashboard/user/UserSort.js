@@ -1,19 +1,30 @@
 import { useState } from 'react';
-// @mui
 import { Menu, Button, MenuItem, Typography } from '@mui/material';
-// component
+import PropTypes from 'prop-types';
 import Iconify from '../../../components/iconify';
 
-// ----------------------------------------------------------------------
-
-const SORT_BY_OPTIONS = [
-  { value: 'featured', label: 'Featured' },
-  { value: 'newest', label: 'Newest' },
-  { value: 'priceDesc', label: 'Price: High-Low' },
-  { value: 'priceAsc', label: 'Price: Low-High' },
+const schoolList = [
+  { value: 'sme', label: 'SME' },
+  { value: 'sbft', label: 'SBFT' },
+  { value: 'soict', label: 'SOICT' },
+  { value: 'stlf', label: 'STFL' },
+  { value: 'sest', label: 'SEST' },
+  { value: 'smse', label: 'SMSE' },
+  { value: 'sem', label: 'SEM' },
+  { value: 'sce', label: 'SCE' },
+  { value: 'sofl', label: 'SOLF' },
+  { value: 'sepd', label: 'SEPD' },
+  { value: 'sami', label: 'SAMI' },
+  { value: 'sep', label: 'SEP' },
+  { value: 'seee', label: 'SEEE' },
 ];
 
-export default function ShopProductSort() {
+UserSort.propTypes = {
+  currentSchool: PropTypes.string,
+  handleFilterSchool: PropTypes.func,
+};
+
+export default function UserSort({ currentSchool, handleFilterSchool }) {
   const [open, setOpen] = useState(null);
 
   const handleOpen = (event) => {
@@ -32,9 +43,9 @@ export default function ShopProductSort() {
         onClick={handleOpen}
         endIcon={<Iconify icon={open ? 'eva:chevron-up-fill' : 'eva:chevron-down-fill'} />}
       >
-        Find:&nbsp;
+        School: &nbsp;&nbsp;
         <Typography component="span" variant="subtitle2" sx={{ color: 'text.secondary' }}>
-          School
+          {currentSchool}
         </Typography>
       </Button>
       <Menu
@@ -45,11 +56,14 @@ export default function ShopProductSort() {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        {SORT_BY_OPTIONS.map((option) => (
+        {schoolList.map((option) => (
           <MenuItem
             key={option.value}
-            selected={option.value === 'newest'}
-            onClick={handleClose}
+            selected={currentSchool === option.value} // Update the selected prop
+            onClick={async () => {
+              handleClose();
+              await handleFilterSchool(option.value);
+            }}
             sx={{ typography: 'body2' }}
           >
             {option.label}

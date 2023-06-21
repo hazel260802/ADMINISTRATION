@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { filter } from 'lodash';
 // @mui
 import {
@@ -14,11 +14,11 @@ import {
   TableCell,
   Container,
 } from '@mui/material';
+import { Link as RouterLink, Await } from 'react-router-dom';
 // components
 import Scrollbar from '../../../components/scrollbar';
 // sections
 import { UserListHead } from '../user';
-
 
 // ----------------------------------------------------------------------
 
@@ -65,7 +65,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function StudentGPATable({data}) {
+export default function StudentLanguageTable({ data }) {
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -80,17 +80,11 @@ export default function StudentGPATable({data}) {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const [quantity, setQuantity] = useState(10);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
   const handleClose = () => {
     setOpen(false);
   };
 
-  const handleRequestSort = (event, property) => {
+  const handleRequestSort = (property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
@@ -105,22 +99,7 @@ export default function StudentGPATable({data}) {
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
-  };
-
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (newPage) => {
     setPage(newPage);
   };
 
@@ -144,7 +123,6 @@ export default function StudentGPATable({data}) {
     <>
       <Container>
         <Card>
-
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
@@ -158,45 +136,58 @@ export default function StudentGPATable({data}) {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredDetails.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { studentId, name, dob, termId, note, date, listening, reading, total} = row;
-                    const selectedUser = selected.indexOf(termId) !== -1;
+                  <Suspense fallback={<p style={{ textAlign: 'center' }}>Loading...</p>}>
+                    <Await resolve={data}>
+                      {(filteredDetails) => {
+                        const slicedDetails = filteredDetails.slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        );
 
-                    return (
-                      <TableRow hover key={termId} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                        return (
+                          <>
+                            {slicedDetails.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                              const { studentId, name, dob, termId, note, date, listening, reading, total } = row;
+                              const selectedUser = selected.indexOf(termId) !== -1;
 
-                        <TableCell align="left">{termId}</TableCell>
+                              return (
+                                <TableRow hover key={termId} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                                  <TableCell align="left">{termId}</TableCell>
 
-                        <TableCell align="left">{studentId}</TableCell>
+                                  <TableCell align="left">{studentId}</TableCell>
 
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2}>
-                            <Typography variant="subtitle2" noWrap>
-                              {name}
-                            </Typography>
-                          </Stack>
-                        </TableCell>
+                                  <TableCell component="th" scope="row" padding="none">
+                                    <Stack direction="row" alignItems="center" spacing={2}>
+                                      <Typography variant="subtitle2" noWrap>
+                                        {name}
+                                      </Typography>
+                                    </Stack>
+                                  </TableCell>
 
-                        <TableCell align="left">{dob}</TableCell>
+                                  <TableCell align="left">{dob}</TableCell>
 
-                        <TableCell align="left">{note}</TableCell>
+                                  <TableCell align="left">{note}</TableCell>
 
-                        <TableCell align="left">{date}</TableCell>
+                                  <TableCell align="left">{date}</TableCell>
 
-                        <TableCell align="left">{listening}</TableCell>
+                                  <TableCell align="left">{listening}</TableCell>
 
-                        <TableCell align="left">{reading}</TableCell>
-                        
-                        <TableCell align="left">{total}</TableCell>
-                      </TableRow>
-                      
-                    );
-                  })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
+                                  <TableCell align="left">{reading}</TableCell>
+
+                                  <TableCell align="left">{total}</TableCell>
+                                </TableRow>
+                              );
+                            })}
+                            {emptyRows > 0 && (
+                              <TableRow style={{ height: 53 * emptyRows }}>
+                                <TableCell colSpan={6} />
+                              </TableRow>
+                            )}
+                          </>
+                        );
+                      }}
+                    </Await>
+                  </Suspense>
                 </TableBody>
 
                 {isNotFound && (

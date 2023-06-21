@@ -34,11 +34,25 @@ const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
 
 UserListToolbar.propTypes = {
   numSelected: PropTypes.number,
-  filterName: PropTypes.string,
-  onFilterName: PropTypes.func,
+  filterStudentId: PropTypes.string,
+  onFilterStudentId: PropTypes.func,
+  filterCohort: PropTypes.string,
+  onFilterCohort: PropTypes.func,
+  onSubmit: PropTypes.func,
+  currentSchool: PropTypes.string,
+  handleFilterSchool: PropTypes.func,
 };
 
-export default function UserListToolbar({ numSelected, filterName, onFilterName }) {
+export default function UserListToolbar({
+  numSelected,
+  filterStudentId,
+  onFilterStudentId,
+  filterCohort,
+  onFilterCohort,
+  onSubmit,
+  currentSchool,
+  handleFilterSchool,
+}) {
   return (
     <StyledRoot
       sx={{
@@ -54,9 +68,10 @@ export default function UserListToolbar({ numSelected, filterName, onFilterName 
         </Typography>
       ) : (
         <StyledSearch
-          value={filterName}
-          onChange={onFilterName}
-          placeholder="Student name/ MSSV"
+          value={filterStudentId}
+          onChange={onFilterStudentId}
+          onKeyDown={onSubmit}
+          placeholder="Student ID"
           startAdornment={
             <InputAdornment position="start">
               <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
@@ -65,8 +80,9 @@ export default function UserListToolbar({ numSelected, filterName, onFilterName 
         />
       )}
       <StyledSearch
-        value={filterName}
-        onChange={onFilterName}
+        value={filterCohort}
+        onChange={onFilterCohort}
+        onKeyDown={onSubmit}
         placeholder="Cohort"
         startAdornment={
           <InputAdornment position="start">
@@ -75,7 +91,10 @@ export default function UserListToolbar({ numSelected, filterName, onFilterName 
         }
       />
       <Stack direction="row" flexWrap="wrap-reverse" alignItems="center" justifyContent="flex-end" sx={{ mb: 1 }}>
-        <UserSort />
+        <UserSort
+          currentSchool={currentSchool}
+          handleFilterSchool={handleFilterSchool}
+        />
       </Stack>
     </StyledRoot>
   );

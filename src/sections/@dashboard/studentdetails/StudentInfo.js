@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useParams } from 'react';
 import { filter } from 'lodash';
 // @mui
 import {
@@ -34,7 +34,7 @@ const KEY_TITLE = [
   { id: 'columnKey', value: 'school', label: 'School', alignRight: false },
   { id: 'columnKey', value: 'studyStatus', label: 'Study Status', alignRight: false },
   { id: 'columnKey', value: 'gender', label: 'Gender', alignRight: false },
-  { id: 'columnKey', value: 'studentClass', label: 'Class', alignRight: false },
+  { id: 'columnKey', value: 'class', label: 'Class', alignRight: false },
   { id: 'columnKey', value: 'cohort', label: 'Cohort', alignRight: false },
   { id: 'columnKey', value: 'email', label: 'Email', alignRight: false },
 ];
@@ -70,7 +70,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function StudentGPATable({ data }) {
+export default function StudentInfo({ data }) {
   const [open, setOpen] = useState(null);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
@@ -78,17 +78,6 @@ export default function StudentGPATable({ data }) {
   const [orderBy, setOrderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
 
-  const handleOpenOption = (event, id) => {
-    setOpen(id);
-  };
-
-  const handleCloseOption = () => {
-    setOpen(null);
-  };
-
-  const handleDeleteUsers = () => {
-    console.log('Delete:', selected);
-  };
 
   const handleSelectOne = (studentId) => {
     setSelected((prevSelected) => {
@@ -114,29 +103,6 @@ export default function StudentGPATable({ data }) {
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleFilterByName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
-  };
 
   const filteredDetails = applySortFilter(data, getComparator(order, orderBy), filterName);
   const emptyRows = page > 0 ? Math.max(0, 1 + page - data.length) : 0;
@@ -169,7 +135,7 @@ export default function StudentGPATable({ data }) {
                       school,
                       studyStatus,
                       gender,
-                      studentClass,
+                      class: studentClass, 
                       cohort,
                       email,
                     } = row;
@@ -211,7 +177,7 @@ export default function StudentGPATable({ data }) {
                               <TableCell align="left">{studyStatus}</TableCell>
                             ) : key.value === 'gender' ? (
                               <TableCell align="left">{gender}</TableCell>
-                            ) : key.value === 'studentClass' ? (
+                            ) : key.value === 'class' ? (
                               <TableCell align="left">{studentClass}</TableCell>
                             ) : key.value === 'cohort' ? (
                               <TableCell align="left">{cohort}</TableCell>
