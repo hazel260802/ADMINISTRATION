@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
-import { filter } from 'lodash';
 import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, json, useLoaderData } from 'react-router-dom';
+
 // @mui
 import {
   Card,
@@ -16,134 +16,127 @@ import {
   Typography,
   TableContainer,
   TablePagination,
-  Link,
   IconButton,
+  Link,
 } from '@mui/material';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import SummarizeIcon from '@mui/icons-material/Summarize';
+
 // components
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
-import Dialog from '../components/dialog';
+
 // sections
-import { JobLogListHead, JobLogListToolbar } from '../sections/@dashboard/joblog';
-// mock
-import JOBLOGLIST from '../_mock/joblog';
-import LOGDETAILS from '../_mock/logdetails';
+import { JobLogListToolbar, JobLogListHead } from '../sections/@dashboard/joblog';
+
+// service
+import { getJobs, getSemesters } from '../services/jobs';
+
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
-  { id: 'studentId', label: 'Student Id', alignRight: false },
-  { id: 'jobId', label: 'Job Id', alignRight: false },
-  { id: 'method', label: 'Method', alignRight: false },
-  { id: 'url', label: 'URL', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
-  { id: 'details', label: 'Details', alignRight: false },
+  { id: 'studentId', label: 'StudentId', alignRight: false },
+  { id: 'termId', label: 'TermId', alignRight: false },
+  { id: 'jobId', label: 'JobId', alignRight: false },
+  { id: 'jobDetails', label: 'Job Details', alignRight: false },
 ];
 
 // ----------------------------------------------------------------------
 
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function applySortFilter(array, comparator, query) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
-  }
-  return stabilizedThis.map((el) => el[0]);
-}
-
 export default function JobLogPage() {
-  const [open, setOpen] = useState(null);
+  // Get loader data
+  const loaderData = useLoaderData();
+  const { jobList: loadedJobList, jobQuantity: loadedJobQuantity, semesterList: loadedSemesterList } = loaderData;
 
+  // Local states
   const [page, setPage] = useState(0);
-
-  const [order, setOrder] = useState('asc');
-
-  const [selected, setSelected] = useState([]);
-
-  const [orderBy, setOrderBy] = useState('name');
-
+  const [order] = useState('asc');
+  const [selected] = useState([]);
+  const [orderBy] = useState('name');
   const [filterName, setFilterName] = useState('');
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  // Custom states
+  const [jobList, setJobList] = useState(loadedJobList);
+  const [jobQuantity, setJobQuantity] = useState(loadedJobQuantity);
+  const [semesterList] = useState(loadedSemesterList);
+  const [currentSemester, setCurrentSemester] = useState(semesterList.length > 0 ? semesterList[0] : 'None');
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  // Params
+  const isNotFound = !jobList.length && !!filterName;
+  const noData = !jobList.length && !filterName;
+
+  // Update current job list
+  const updateJobList = async (studentId, termId, page, size) => {
+    const response = await getJobs({
+      studentId,
+      termId,
+      page,
+      size,
+    });
+
+    if (!response.ok) throw Error('Fail to filter data!');
+
+    const newJobData = await response.json();
+    const { DKHPTDJobV1List: newJobList, quantity: newJobQuantity } = newJobData.data;
+
+    console.log(`New job list: ${JSON.stringify(newJobList)}`);
+    console.log(`New job quantity: ${JSON.stringify(newJobQuantity)}`);
+
+    // Change local states
+    setJobList(newJobList);
+    setJobQuantity(newJobQuantity);
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  // Change semester
+  const handleFilterSemester = async (semester) => {
+    setCurrentSemester(semester);
+    console.log(`Change semester to ${semester}`);
+
+    // Reset data
+    await updateJobList(null, semester, 1, rowsPerPage);
+
+    // Back to page 1
+    setPage(0);
+    setFilterName('');
   };
 
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
+  // Change page
+  const handleChangePage = async (newPage) => {
+    console.log(`Jump to page ${newPage}`);
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = JOBLOGLIST.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
+    // Reset data
+    await updateJobList(null, currentSemester, newPage + 1, rowsPerPage);
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
-  };
-
-  const handleChangePage = (event, newPage) => {
+    // Change page
     setPage(newPage);
+    setFilterName('');
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  // Change row per page
+  const handleChangeRowsPerPage = async (event) => {
+    const newRowPerPage = parseInt(event.target.value, 10);
+
+    // Reset data
+    await updateJobList(null, currentSemester, 1, newRowPerPage);
+
+    // Back to page 1
     setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(newRowPerPage);
+    setFilterName('');
   };
 
-  const handleFilterByName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
+  const handleSearchSubmit = async (event) => {
+    if (event.key === 'Enter') {
+      console.log(`Enter pressed. Search for ${filterName}!`);
+
+      // Update job list
+      await updateJobList(filterName === '' ? null : filterName, currentSemester, 1, rowsPerPage);
+
+      // Back to page 1
+      setPage(0);
+    }
   };
-
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - JOBLOGLIST.length) : 0;
-
-  const filteredJobLog = applySortFilter(JOBLOGLIST, getComparator(order, orderBy), filterName);
-
-  const isNotFound = !filteredJobLog.length && !!filterName;
 
   return (
     <>
@@ -159,7 +152,17 @@ export default function JobLogPage() {
         </Stack>
 
         <Card>
-          <JobLogListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <JobLogListToolbar
+            semesterList={semesterList}
+            currentSemester={currentSemester}
+            handleFilterSemester={handleFilterSemester}
+            numSelected={selected.length}
+            filterName={filterName}
+            onFilterName={(event) => {
+              setFilterName(event.target.value);
+            }}
+            onSubmit={handleSearchSubmit}
+          />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -168,18 +171,19 @@ export default function JobLogPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={JOBLOGLIST.length}
+                  rowCount={jobList.length}
                   numSelected={selected.length}
-                  onRequestSort={handleRequestSort}
-                  onSelectAllClick={handleSelectAllClick}
+                  onRequestSort={() => console.log('Call handleRequestSort!')}
+                  onSelectAllClick={() => console.log('Call handleAllSelectClick!')}
                 />
                 <TableBody>
-                  {filteredJobLog.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { no, studentId, jobId, method, url, status } = row;
+                  {jobList.map((row, index) => {
+                    const no = page * rowsPerPage + index + 1;
+                    const { username: studentId, _id: jobId, termId } = row;
                     const selectedJobLog = selected.indexOf(studentId) !== -1;
 
                     return (
-                      <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedJobLog}>
+                      <TableRow hover key={jobId} tabIndex={-1} role="checkbox" selected={selectedJobLog}>
                         <TableCell align="left">{no}</TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
@@ -190,15 +194,11 @@ export default function JobLogPage() {
                           </Stack>
                         </TableCell>
 
+                        <TableCell align="left">{termId}</TableCell>
+
                         <TableCell align="left">{jobId}</TableCell>
 
-                        <TableCell align="left">{method}</TableCell>
-
-                        <TableCell align="left">{url}</TableCell>
-
-                        <TableCell align="left">{status}</TableCell>
-
-                        <TableCell align="center">
+                        <TableCell align="left">
                           <Link
                             component={RouterLink}
                             to={`/dashboard/joblog/${jobId}/details`}
@@ -213,11 +213,6 @@ export default function JobLogPage() {
                       </TableRow>
                     );
                   })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
                 </TableBody>
 
                 {isNotFound && (
@@ -243,21 +238,97 @@ export default function JobLogPage() {
                     </TableRow>
                   </TableBody>
                 )}
+
+                {noData && (
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                        <Paper
+                          sx={{
+                            textAlign: 'center',
+                          }}
+                        >
+                          <Typography variant="h6" paragraph>
+                            Data does not exist!
+                          </Typography>
+
+                          <Typography variant="body2">
+                            No results found for semester &nbsp;
+                            <strong>&quot;{currentSemester}&quot;</strong>.
+                            <br /> Try other semesters instead.
+                          </Typography>
+                        </Paper>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                )}
               </Table>
             </TableContainer>
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[5, 10, 15, 20, 25]}
             component="div"
-            count={JOBLOGLIST.length}
+            count={jobQuantity}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <Button
+            sx={{
+              pointerEvents: 'none',
+            }}
+            variant="contained"
+            size="large"
+            color="primary"
+            startIcon={<SummarizeIcon />}
+          >
+            Quantity: {jobQuantity}
+          </Button>
+        </div>
       </Container>
     </>
   );
+}
+
+export async function joblogLoader() {
+  // Get semester list
+  const semesterResponse = await getSemesters();
+
+  const semesterData = await semesterResponse.json();
+
+  if (!semesterResponse.ok) {
+    console.log(`Error code: ${semesterResponse.status}`);
+    console.log(`Error message: ${semesterData.message}`);
+  }
+
+  const semesterList = semesterData.data.sort().reverse(); // sort semester
+  console.log(`Loaded semesters: ${JSON.stringify(semesterList)}`);
+
+  // Sort semesters
+  const latestSemester = semesterList[0];
+  const jobResponse = await getJobs({
+    studentId: null,
+    termId: latestSemester,
+    page: 1,
+    size: 10,
+  });
+
+  const jobsData = await jobResponse.json();
+
+  if (!jobResponse.ok) {
+    console.log(`Error code: ${jobResponse.status}`);
+    console.log(`Error message: ${jobsData.message}`);
+  }
+
+  const { DKHPTDJobV1List: jobList, quantity: jobQuantity } = jobsData.data;
+
+  console.log(`Loaded job list: ${JSON.stringify(jobList)}`);
+  console.log(`Loaded job quantity: ${jobQuantity}`);
+
+  return json({ jobList, jobQuantity, semesterList });
 }

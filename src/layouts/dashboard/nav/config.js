@@ -12,11 +12,6 @@ const navConfig = [
     icon: icon('ic_user'),
   },
   {
-    title: 'timetable',
-    path: '/dashboard/timetable',
-    icon: icon('ic_timetable'),
-  },
-  {
     title: 'job log result',
     path: '/dashboard/joblog',
     icon: icon('ic_joblog'),

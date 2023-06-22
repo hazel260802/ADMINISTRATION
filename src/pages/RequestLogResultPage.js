@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet-async';
-import { filter } from 'lodash';
 import { Suspense, useState } from 'react';
 import { Link as RouterLink, useLoaderData, json, defer, Await } from 'react-router-dom';
 // @mui
@@ -21,7 +20,7 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 // components
 import Scrollbar from '../components/scrollbar';
 // sections
-import { JobLogListHead, JobLogListToolbar } from '../sections/@dashboard/joblog';
+import { RequestLogListHead, RequestLogListToolbar } from '../sections/@dashboard/requestlog';
 // service
 import { getRequestLogs } from '../services/requestlog';
 
@@ -29,7 +28,7 @@ import { getRequestLogs } from '../services/requestlog';
 
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
-  { id: 'studentId', label: 'StudentId', alignRight: false },
+  { id: 'username', label: 'Username', alignRight: false },
   { id: 'method', label: 'Method', alignRight: false },
   { id: 'url', label: 'URL', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
@@ -39,55 +38,46 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function applySortFilter(array, comparator, query) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
-  }
-  return stabilizedThis.map((el) => el[0]);
-}
-
 export default function RequestLogPage() {
   const { data } = useLoaderData();
-  const { requestLogs } = data;
-  
-  //Local states
+  const { quantity, requestLogs } = data;
 
+  // Local states
   const [page, setPage] = useState(0);
-
   const [order, setOrder] = useState('asc');
-
   const [selected, setSelected] = useState([]);
-
-  const [orderBy, setOrderBy] = useState('name');
-
+  const [orderBy, setOrderBy] = useState('username');
   const [filterName, setFilterName] = useState('');
-
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  // Custom states
+  const [requestList, setRequestList] = useState(requestLogs);
+  const [requestQuantity, setRequestQuantity] = useState(quantity);
+  // Params
+  const isNotFound = !requestList.length && !!filterName;
+  const noData = !requestList.length && !filterName;
 
-  const handleRequestSort = (event, property) => {
+  // Update current request job list
+  const updateRequestList = async ({ username, page, size }) => {
+    const response = await getRequestLogs({
+      username,
+      page,
+      size,
+    });
+
+    if (!response.ok) throw Error('Fail to filter data!');
+
+    const newRequestJobData = await response.json();
+    const { requestLogs: newRequestList, quantity: newQuantity } = newRequestJobData.data;
+    console.log(`New request job list: ${JSON.stringify(newRequestList)}`);
+    console.log(`New request quantity: ${JSON.stringify(newQuantity)}`);
+
+    // Change local states
+    setRequestList(newRequestList);
+    setRequestQuantity(newQuantity);
+  };
+
+  const handleRequestSort = (property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
@@ -95,38 +85,54 @@ export default function RequestLogPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = requestLogs.map((n) => n.name);
+      const newSelecteds = requestList.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
 
+  // Change page
+  const handleChangePage = async (event, newPage) => {
+    console.log(`Jump to page ${newPage}`);
 
-  const handleChangePage = (event, newPage) => {
+    // Reset data
+    await updateRequestList({ username: filterName, page: newPage + 1, size: rowsPerPage });
+
+    // Change page
     setPage(newPage);
+    setFilterName('');
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  // Change row per page
+  const handleChangeRowsPerPage = async (event) => {
+    const newRowPerPage = parseInt(event.target.value, 10);
+
+    // Reset data
+    await updateRequestList({ username: filterName, page: 1, size: newRowPerPage });
+
+    // Back to page 1
     setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(newRowPerPage);
+    setFilterName('');
   };
 
-  const handleFilterByName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
+  const handleSearchSubmit = async (event) => {
+    if (event.key === 'Enter') {
+      console.log(`Enter pressed. Search for ${filterName}!`);
+
+      // Update job list
+      await updateRequestList({ username: filterName, page: 1, size: rowsPerPage });
+
+      // Back to page 1
+      setPage(0);
+    }
   };
-
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - requestLogs.length) : 0;
-
-  const filteredJobLog = applySortFilter(requestLogs, getComparator(order, orderBy), filterName);
-
-  const isNotFound = !filteredJobLog.length && !!filterName;
 
   return (
     <>
       <Helmet>
-        <title> Job Log Result </title>
+        <title> Request Log Result </title>
       </Helmet>
 
       <Container>
@@ -147,65 +153,61 @@ export default function RequestLogPage() {
         </Stack>
 
         <Card>
-          <JobLogListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <RequestLogListToolbar
+            numSelected={selected.length}
+            filterName={filterName}
+            onFilterName={(event) => {
+              setFilterName(event.target.value);
+            }}
+            onSubmit={handleSearchSubmit}
+          />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
-                <JobLogListHead
+                <RequestLogListHead
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={requestLogs.length}
+                  rowCount={requestList.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
                   <Suspense fallback={<p style={{ textAlign: 'center' }}>Loading...</p>}>
-                    <Await resolve={requestLogs}>
-                      {(loadedLogJobs) => {
-                        const slicedLogJobs = loadedLogJobs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+                    <Await resolve={requestList}>
+                      {requestList.map((row, index) => {
+                        const no = page * rowsPerPage + index + 1;
+                        const { username, method, url, status, timestamp, responseTime, responseTimeUnit } = row;
+                        const selectedRequestLog = selected.indexOf(username) !== -1;
 
                         return (
-                          <>
-                            {slicedLogJobs.map((row, index) => {
-                              const no = page * rowsPerPage + index + 1;
-                              const { studentId, method, url, status, timestamp, reponseTime } = row;
-                              const selectedLogJob = selected.indexOf(studentId) !== -1;
+                          <TableRow hover key={username} tabIndex={-1} role="checkbox" selected={selectedRequestLog}>
+                            <TableCell align="left">{no}</TableCell>
 
-                              return (
-                                <TableRow hover key={studentId} tabIndex={-1} role="checkbox" selected={selectedLogJob}>
-                                  <TableCell align="left">{no}</TableCell>
+                            <TableCell component="th" scope="row" padding="none">
+                              <Stack direction="row" alignItems="center" marginLeft={2} spacing={2}>
+                                <Typography variant="subtitle2" noWrap>
+                                  {username}
+                                </Typography>
+                              </Stack>
+                            </TableCell>
 
-                                  <TableCell component="th" scope="row" padding="none">
-                                    <Stack direction="row" alignItems="center" marginLeft={2} spacing={2}>
-                                      <Typography variant="subtitle2" noWrap>
-                                        {studentId}
-                                      </Typography>
-                                    </Stack>
-                                  </TableCell>
+                            <TableCell align="center">{method}</TableCell>
 
-                                  <TableCell align="center">{method}</TableCell>
+                            <TableCell align="left">{url}</TableCell>
 
-                                  <TableCell align="left">{url}</TableCell>
+                            <TableCell align="center">{status}</TableCell>
 
-                                  <TableCell align="center">{status}</TableCell>
+                            <TableCell align="left">{timestamp.toString()}</TableCell>
 
-                                  <TableCell align="left">{timestamp.toString()}</TableCell>
-
-                                  <TableCell align="center">{reponseTime} ms</TableCell>
-                                </TableRow>
-                              );
-                            })}
-                            {emptyRows > 0 && (
-                              <TableRow style={{ height: 53 * emptyRows }}>
-                                <TableCell colSpan={6} />
-                              </TableRow>
-                            )}
-                          </>
+                            <TableCell align="center">
+                              {responseTime} {responseTimeUnit}
+                            </TableCell>
+                          </TableRow>
                         );
-                      }}
+                      })}
                     </Await>
                   </Suspense>
                 </TableBody>
@@ -233,14 +235,37 @@ export default function RequestLogPage() {
                     </TableRow>
                   </TableBody>
                 )}
+                {noData && (
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                        <Paper
+                          sx={{
+                            textAlign: 'center',
+                          }}
+                        >
+                          <Typography variant="h6" paragraph>
+                            Data does not exist!
+                          </Typography>
+
+                          <Typography variant="body2">
+                            No results found for username &nbsp;
+                            <strong>&quot;{filterName}&quot;</strong>.
+                            <br /> Try other username instead.
+                          </Typography>
+                        </Paper>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                )}
               </Table>
             </TableContainer>
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[5, 10, 15, 20, 25]}
             component="div"
-            count={requestLogs.length}
+            count={requestQuantity}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -252,7 +277,11 @@ export default function RequestLogPage() {
   );
 }
 async function loadRequestLogs() {
-  const response = await getRequestLogs();
+  const response = await getRequestLogs({
+    username: '',
+    page: 1,
+    size: 5,
+  });
 
   if (response.status === 401 || response.status === 400 || response.status === 422) {
     return response;

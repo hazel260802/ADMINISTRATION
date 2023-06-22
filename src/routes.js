@@ -4,9 +4,8 @@ import DashboardLayout from './layouts/dashboard';
 import SimpleLayout from './layouts/simple';
 import { AppLayout } from './App';
 //
-import TimeTablePage, { timetableLoader } from './pages/TimeTablePage';
 import UserPage, {loader as studentsLoader} from './pages/UserPage';
-import JobLogResultPage from './pages/JobLogResultPage';
+import JobLogResultPage, { joblogLoader } from './pages/JobLogResultPage';
 import RequestLogResultPage, {loader as resquestLogLoader} from './pages/RequestLogResultPage';
 import LoginPage, { action as loginAction } from './pages/LoginPage';
 import { action as logoutAction } from './pages/LogoutPage';
@@ -43,16 +42,15 @@ const router = createBrowserRouter([
                 loader: studentsLoader,
               },
               {
-              path: 'timetable',
-              element: <TimeTablePage />,
-              loader: timetableLoader,
-              },
-              {
                 path: 'user/:id/details',
                 element: <StudentDetailsPage />,
                 loader: studentLoader,
               },
-              { path: 'joblog', element: <JobLogResultPage /> },
+              { 
+                path: 'joblog', 
+                element: <JobLogResultPage />,
+                loader: joblogLoader,
+              },
               {
                 path: 'joblog/:id/details',
                 element: <JobDetailsPage />,

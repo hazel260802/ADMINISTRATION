@@ -73,15 +73,15 @@ export default function UserPage() {
     const newData = await response.json();
     const { studentList: newStudentList, quantity: newQuantity } = newData.data;
 
-    // Filter the student list based on filterName and filterStudentId
-    const filteredStudentList = newStudentList.filter((student) =>
-      student.studentId.toString().includes(filterStudentId)
-    );
+    // Filter the student list based on filterStudentId
+    // const filteredStudentList = newStudentList.filter((student) =>
+    // student.studentId.toString().includes(filterStudentId)
+    // );
     console.log(`New student list: ${JSON.stringify(newStudentList)}`);
     console.log(`New student quantity: ${JSON.stringify(newQuantity)}`);
 
     // Change local states
-    setStudentList(filteredStudentList);
+    setStudentList(newStudentList);
     setStudentQuantity(newQuantity);
   };
 
@@ -91,7 +91,7 @@ export default function UserPage() {
     console.log(`Change school to ${selectedSchool}`);
     // Reset data
     await updateStudentList({
-      studentId: filterStudentId === '' ? '' : filterStudentId,
+      studentId: filterStudentId,
       school: selectedSchool,
       cohort: '',
       page: 1,
@@ -109,7 +109,7 @@ export default function UserPage() {
 
     // Reset data
     await updateStudentList({
-      studentId: filterStudentId === '' ? '' : filterStudentId,
+      studentId: filterStudentId,
       school: currentSchool,
       cohort: '',
       page: newPage + 1,
@@ -146,7 +146,7 @@ export default function UserPage() {
 
       // Update student list
       await updateStudentList({
-        studentId: '',
+        studentId: filterStudentId,
         school: currentSchool,
         cohort: filterCohort,
         page: 1,
@@ -183,14 +183,25 @@ export default function UserPage() {
           <Typography variant="h4" gutterBottom>
             Student List
           </Typography>
+          <Button
+            component={RouterLink}
+            to={`/dashboard/settings`}
+            variant="contained"
+            size="medium"
+            color="secondary"
+            startIcon={<ManageAccountsIcon />}
+          >
+            Settings
+          </Button>
         </Stack>
+        
         <Card>
           <UserListToolbar
             currentSchool={currentSchool}
             handleFilterSchool={handleFilterSchool}
             numSelected={selected.length}
             filterStudentId={filterStudentId}
-            onFilterName={(event) => {
+            onFilterStudentId={(event) => {
               setFilterStudentId(event.target.value);
             }}
             filterCohort={filterCohort}
@@ -294,9 +305,9 @@ export default function UserPage() {
                           </Typography>
 
                           <Typography variant="body2">
-                            No results found for school &nbsp;
-                            <strong>&quot;{currentSchool}&quot;</strong>.
-                            <br /> Try other schools instead.
+                            No results found for cohort &nbsp;
+                            <strong>&quot;{filterCohort}&quot;</strong>.
+                            <br /> Try other cohort instead.
                           </Typography>
                         </Paper>
                       </TableCell>

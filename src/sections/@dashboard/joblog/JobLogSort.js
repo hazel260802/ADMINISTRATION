@@ -1,21 +1,24 @@
+import PropTypes from 'prop-types';
+
 import { useState } from 'react';
 // @mui
 import { Menu, Button, MenuItem, Typography } from '@mui/material';
 // component
 import Iconify from '../../../components/iconify';
 
-// ----------------------------------------------------------------------
+// --------------------------------------------------------------------
 
-const SORT_BY_OPTIONS = [
-  { value: 'featured', label: 'Featured' },
-  { value: 'newest', label: 'Newest' },
-  { value: 'priceDesc', label: 'Price: High-Low' },
-  { value: 'priceAsc', label: 'Price: Low-High' },
-];
+JobLogSort.propTypes = {
+  currentSemester: PropTypes.string,
+  handleFilterSemester: PropTypes.func,
+  semesterList: PropTypes.array
+};
 
-export default function ShopProductSort() {
+export default function JobLogSort({ currentSemester, semesterList, handleFilterSemester }) {
+  // State
   const [open, setOpen] = useState(null);
 
+  // Close and open menu
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
   };
@@ -27,14 +30,18 @@ export default function ShopProductSort() {
   return (
     <>
       <Button
+        sx={{
+          paddingLeft: '20px',
+          paddingRight: '20px'
+        }}
         color="inherit"
         disableRipple
         onClick={handleOpen}
         endIcon={<Iconify icon={open ? 'eva:chevron-up-fill' : 'eva:chevron-down-fill'} />}
       >
-        Find:&nbsp;
+        Semester:&nbsp;&nbsp;
         <Typography component="span" variant="subtitle2" sx={{ color: 'text.secondary' }}>
-          Method
+          {currentSemester}
         </Typography>
       </Button>
       <Menu
@@ -45,14 +52,19 @@ export default function ShopProductSort() {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        {SORT_BY_OPTIONS.map((option) => (
+        {semesterList.map((semester) => (
           <MenuItem
-            key={option.value}
-            selected={option.value === 'newest'}
-            onClick={handleClose}
+            key={semester}
+            selected={semester === semesterList[0]}
+            onClick={
+              async () => {
+                handleClose()
+                await handleFilterSemester(semester)
+              }
+            }
             sx={{ typography: 'body2' }}
           >
-            {option.label}
+            {semester}
           </MenuItem>
         ))}
       </Menu>

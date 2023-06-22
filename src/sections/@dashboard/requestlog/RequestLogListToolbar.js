@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
-import { Toolbar, Typography, OutlinedInput, InputAdornment, Stack } from '@mui/material';
+import { Toolbar, OutlinedInput, InputAdornment,  } from '@mui/material';
 // component
 import Iconify from '../../../components/iconify';
-import TimeTableSort from './TimeTableSort';
 // ----------------------------------------------------------------------
 
 const StyledRoot = styled(Toolbar)(({ theme }) => ({
@@ -32,20 +31,16 @@ const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-UserListToolbar.propTypes = {
+RequestLogToolBar.propTypes = {
   numSelected: PropTypes.number,
   filterName: PropTypes.string,
   onFilterName: PropTypes.func,
   onSubmit: PropTypes.func,
-  currentSemester: PropTypes.string,
-  handleFilterSemester: PropTypes.func,
-  semesterList: PropTypes.array
 };
 
-export default function UserListToolbar({ 
+export default function RequestLogToolBar({ 
   numSelected, filterName, 
   onFilterName, onSubmit,
-  currentSemester, semesterList, handleFilterSemester,
 }) {
   return (
     <StyledRoot
@@ -68,13 +63,6 @@ export default function UserListToolbar({
         }
       />
 
-      <Stack direction="row" flexWrap="wrap-reverse" alignItems="center" justifyContent="flex-end" sx={{ mb: 1 }}>
-        <TimeTableSort 
-          currentSemester={currentSemester} 
-          semesterList={semesterList}
-          handleFilterSemester={handleFilterSemester} 
-        />
-      </Stack>
     </StyledRoot>
   );
 }

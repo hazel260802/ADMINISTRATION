@@ -36,9 +36,17 @@ UserListToolbar.propTypes = {
   numSelected: PropTypes.number,
   filterName: PropTypes.string,
   onFilterName: PropTypes.func,
+  onSubmit: PropTypes.func,
+  currentSemester: PropTypes.string,
+  handleFilterSemester: PropTypes.func,
+  semesterList: PropTypes.array
 };
 
-export default function UserListToolbar({ numSelected, filterName, onFilterName }) {
+export default function UserListToolbar({ 
+  numSelected, filterName, 
+  onFilterName, onSubmit,
+  currentSemester, semesterList, handleFilterSemester,
+}) {
   return (
     <StyledRoot
       sx={{
@@ -48,24 +56,24 @@ export default function UserListToolbar({ numSelected, filterName, onFilterName 
         }),
       }}
     >
-      {numSelected > 0 ? (
-        <Typography component="div" variant="subtitle1">
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <StyledSearch
-          value={filterName}
-          onChange={onFilterName}
-          placeholder="MSSV"
-          startAdornment={
-            <InputAdornment position="start">
-              <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
-            </InputAdornment>
-          }
-        />
-      )}
+      <StyledSearch
+        value={filterName}
+        onChange={onFilterName}
+        onKeyDown={onSubmit}
+        placeholder="Student ID"
+        startAdornment={
+          <InputAdornment position="start">
+            <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled', width: 20, height: 20 }} />
+          </InputAdornment>
+        }
+      />
+
       <Stack direction="row" flexWrap="wrap-reverse" alignItems="center" justifyContent="flex-end" sx={{ mb: 1 }}>
-          <JobLogSort />
+        <JobLogSort 
+          currentSemester={currentSemester} 
+          semesterList={semesterList}
+          handleFilterSemester={handleFilterSemester} 
+        />
       </Stack>
     </StyledRoot>
   );
