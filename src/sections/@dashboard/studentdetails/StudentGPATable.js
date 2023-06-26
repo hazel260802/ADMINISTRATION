@@ -77,9 +77,7 @@ export default function StudentGPATable({ data }) {
 
   const [filterName, setFilterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  const [quantity, setQuantity] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -104,22 +102,8 @@ export default function StudentGPATable({ data }) {
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-    }
-    setSelected(newSelected);
-  };
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (newPage) => {
     setPage(newPage);
   };
 
@@ -233,7 +217,7 @@ export default function StudentGPATable({ data }) {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[10, 15,20, 25]}
             component="div"
             count={data.length}
             rowsPerPage={rowsPerPage}

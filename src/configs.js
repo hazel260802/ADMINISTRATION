@@ -1,5 +1,5 @@
 const CONFIG = {
-  API_SERVER: 'http://acr-backend.b4e.app:8080',
+  API_SERVER: 'http://localhost:8080',
   TOKEN_EXP: 24 * 30 * 3,
 };
 
