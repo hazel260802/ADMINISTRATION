@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
-import { Link as RouterLink, useLoaderData, useParams } from 'react-router-dom';
+import { useLoaderData, useParams } from 'react-router-dom';
 
 // @mui
-import { Stack, Typography, Container, Button, Tabs, Tab, Box } from '@mui/material';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-
+import { Stack, Typography, Container, Tabs, Tab, Box } from '@mui/material';
 // sections
 import { JobDetailTable, JobResultTable } from '../sections/@dashboard/jobdetails';
 
