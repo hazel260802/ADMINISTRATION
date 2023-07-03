@@ -1,5 +1,5 @@
 const CONFIG = {
-  API_SERVER: 'http://acr-backend.b4e.app',
+  API_SERVER: 'https://acr-backend.b4e.app',
   TOKEN_EXP: 24 * 30 * 3,
 };
 
