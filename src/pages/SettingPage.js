@@ -36,11 +36,10 @@ export default function SettingPage() {
     submit(settings, { method: 'post', action: '/dashboard/settings/dkhptd-time' });
   };
 
-  const handleCancel = () => {
-    return redirect('/dashboard/settings');
-  };
+  const handleCancel = () => redirect('/dashboard/settings');
 
-  const renderTextField = ({ name, unit, label, defaultValue, error, helperText }) => {
+
+  const renderTextField = ({ name, unit, defaultValue, helperText }) => {
     const defaultUnit = defaultValue.slice(-1);
     defaultValue = parseInt(defaultValue.slice(0, -1), 10);
 
@@ -99,7 +98,7 @@ export default function SettingPage() {
                 </Grid> */}
                 <Grid item xs={4}>
                   <Typography variant="subtitle1" gutterBottom>
-                    Crawl Job Cycle
+                    Student Information
                   </Typography>
                 </Grid>
                 <Grid item xs={8}>
@@ -114,7 +113,7 @@ export default function SettingPage() {
                 </Grid>
                 <Grid item xs={4}>
                   <Typography variant="subtitle1" gutterBottom>
-                    DKHPTD Job Cycle
+                    Course Register
                   </Typography>
                 </Grid>
                 <Grid item xs={8}>
