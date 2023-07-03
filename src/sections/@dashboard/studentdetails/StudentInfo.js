@@ -1,5 +1,6 @@
-import { useState, useParams } from 'react';
+import { useState } from 'react';
 import { filter } from 'lodash';
+import PropTypes from 'prop-types';
 // @mui
 import {
   Card,
@@ -71,22 +72,11 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function StudentInfo({ data }) {
-  const [open, setOpen] = useState(null);
-  const [page, setPage] = useState(0);
+  const [page] = useState(0);
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
   const [orderBy, setOrderBy] = useState('name');
-  const [filterName, setFilterName] = useState('');
-
-
-  const handleSelectOne = (studentId) => {
-    setSelected((prevSelected) => {
-      if (!prevSelected.includes(studentId)) {
-        return [...prevSelected, studentId];
-      }
-      return prevSelected.filter((id) => id !== studentId);
-    });
-  };
+  const [filterName] = useState('');
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -143,10 +133,10 @@ export default function StudentInfo({ data }) {
 
                     return (
                       <>
-                        {KEY_TITLE.map((key) => (
+                        {KEY_TITLE.map((key,index) => (
                           <TableRow
                             hover
-                            key={studentId}
+                            key={index}
                             tabIndex={-1}
                             role="checkbox"
                             selected={isItemSelected}
@@ -229,3 +219,6 @@ export default function StudentInfo({ data }) {
     </>
   );
 }
+StudentInfo.propTypes = {
+  data: PropTypes.array.isRequired,
+};

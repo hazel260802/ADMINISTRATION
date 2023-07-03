@@ -1,5 +1,6 @@
 import { Suspense, useState } from 'react';
 import { filter } from 'lodash';
+import PropTypes from 'prop-types';
 // @mui
 import {
   Card,
@@ -14,7 +15,7 @@ import {
   TableCell,
   Container,
 } from '@mui/material';
-import { Link as RouterLink, Await } from 'react-router-dom';
+import {Await} from 'react-router-dom';
 // components
 import Scrollbar from '../../../components/scrollbar';
 // sections
@@ -66,8 +67,6 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function StudentLanguageTable({ data }) {
-  const [open, setOpen] = useState(null);
-
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -76,13 +75,9 @@ export default function StudentLanguageTable({ data }) {
 
   const [orderBy, setOrderBy] = useState('name');
 
-  const [filterName, setFilterName] = useState('');
+  const [filterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const handleRequestSort = (property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -106,11 +101,6 @@ export default function StudentLanguageTable({ data }) {
   const handleChangeRowsPerPage = (event) => {
     setPage(0);
     setRowsPerPage(parseInt(event.target.value, 10));
-  };
-
-  const handleFilterByName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
@@ -148,10 +138,10 @@ export default function StudentLanguageTable({ data }) {
                           <>
                             {slicedDetails.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                               const { studentId, name, dob, termId, note, date, listening, reading, total } = row;
-                              const selectedUser = selected.indexOf(termId) !== -1;
+                              const selectedUser = selected.indexOf(date) !== -1;
 
                               return (
-                                <TableRow hover key={termId} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                                <TableRow hover key={date} tabIndex={-1} role="checkbox" selected={selectedUser}>
                                   <TableCell align="left">{termId}</TableCell>
 
                                   <TableCell align="left">{studentId}</TableCell>
@@ -231,3 +221,7 @@ export default function StudentLanguageTable({ data }) {
     </>
   );
 }
+StudentLanguageTable.propTypes = {
+  data: PropTypes.array.isRequired,
+};
+

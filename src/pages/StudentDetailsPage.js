@@ -1,17 +1,16 @@
 import { Helmet } from 'react-helmet-async';
-import { Link as RouterLink, useLoaderData, json} from 'react-router-dom';
+import {useLoaderData} from 'react-router-dom';
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 // @mui
 import {
   Stack,
   Typography,
   Container,
-  Button,
   Tabs,
   Tab,
   Box,
 } from '@mui/material';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 // sections
 import {StudentGPATable, StudentInfo, StudentLanguageTable, StudentSubjectTable} from '../sections/@dashboard/studentdetails'
 // service
@@ -37,6 +36,11 @@ function LinkTab(props) {
 function TabPanel({ children, value, index }) {
   return <div hidden={value !== index}>{children}</div>;
 }
+TabPanel.propTypes = {
+  children: PropTypes.node.isRequired,
+  value: PropTypes.string.isRequired,
+  index: PropTypes.string.isRequired,
+};
 export default function StudentDetailsPage() {
 
   const { res1, res2, res3, res4 } = useLoaderData();
@@ -114,7 +118,6 @@ export default function StudentDetailsPage() {
 export async function loadStudent({ params }) {
   const { id }  = params;
   const response = await getStudentPromise(id);
-
   return response;
 }
 

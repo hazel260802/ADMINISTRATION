@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { filter } from 'lodash';
+import PropTypes from 'prop-types';
 // @mui
 import {
   Card,
@@ -7,7 +8,6 @@ import {
   Stack,
   Typography,
   TableContainer,
-  TablePagination,
   Paper,
   TableRow,
   TableBody,
@@ -64,9 +64,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function StudentGPATable({ data }) {
-  const [open, setOpen] = useState(null);
-
-  const [page, setPage] = useState(0);
+  const [page] = useState(0);
 
   const [order, setOrder] = useState('asc');
 
@@ -76,10 +74,10 @@ export default function StudentGPATable({ data }) {
 
   const [filterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage] = useState(10);
 
 
-  const handleRequestSort = (event, property) => {
+  const handleRequestSort = (property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
@@ -117,7 +115,7 @@ export default function StudentGPATable({ data }) {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredDetails.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                  {filteredDetails.map((row) => {
                     const {
                       termId,
                       subjectId,
@@ -128,10 +126,10 @@ export default function StudentGPATable({ data }) {
                       finalGrade,
                       letterGrade,
                     } = row;
-                    const selectedUser = selected.indexOf(termId) !== -1;
+                    const selectedUser = selected.indexOf(subjectId) !== -1;
 
                     return (
-                      <TableRow hover key={termId} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                      <TableRow hover key={subjectId} tabIndex={-1} role="checkbox" selected={selectedUser}>
                         <TableCell align="left">{termId}</TableCell>
 
                         <TableCell align="left">{subjectId}</TableCell>
@@ -195,3 +193,6 @@ export default function StudentGPATable({ data }) {
     </>
   );
 }
+StudentGPATable.propTypes = {
+  data: PropTypes.array.isRequired,
+};
