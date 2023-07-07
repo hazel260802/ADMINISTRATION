@@ -61,8 +61,8 @@ export default function UserPage() {
   const [currentSchool, setCurrentSchool] = useState('');
 
   // Params
-  const isNotFound = !studentFilterList.length && !!filterStudentId && !!filterCohort;
-  const noData = !studentFilterList.length && !filterStudentId && !!filterCohort;
+  const isNotFound = !studentFilterList?.length && !!filterStudentId && !!filterCohort;
+  const noData = !studentFilterList?.length && !filterStudentId && !!filterCohort;
 
   // Update current student list
   const updateStudentList = async ({ studentId, school, cohort, page, size }) => {
@@ -104,7 +104,7 @@ export default function UserPage() {
   };
 
   // Change page
-  const handleChangePage = async (event, newPage) => {
+  const handleChangePage = async (newPage) => {
     console.log(`Jump to page ${newPage}`);
 
     // Reset data
@@ -225,7 +225,7 @@ export default function UserPage() {
                 />
                 <TableBody>
                   <Suspense fallback={<p style={{ textAlign: 'center' }}>Loading...</p>}>
-                    <Await resolve={studentFilterList}>
+                    <Await resolve={studentFilterList&&studentQuantity}>
                       {studentFilterList.map((row, index) => {
                         const no = page * rowsPerPage + index + 1;
                         const { name, studentId, cohort, school } = row;

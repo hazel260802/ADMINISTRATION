@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
-import { useLoaderData, useParams } from 'react-router-dom';
+import { useLoaderData, useParams, Await } from 'react-router-dom';
 
 // @mui
 import { Stack, Typography, Container, Tabs, Tab, Box } from '@mui/material';
@@ -116,11 +116,17 @@ export default function StudentDetailsPage() {
               mt: 3,
             }}
           >
-            {tabs.map((tab) => (
-              <TabPanel key={tab.id} value={value} index={tab.id}>
-                {value === tab.id && <tab.component id={id} jobId={tab.jobId} data={tab.data} />}
-              </TabPanel>
-            ))}
+            <Suspense fallback={<p style={{ textAlign: 'center' }}>Loading...</p>}>
+              {tabs.map((tab) => (
+                <TabPanel key={tab.id} value={value} index={tab.id}>
+                  {value === tab.id && (
+                    <Await resolve={jobDetail&&jobResults}>
+                      <tab.component id={id} jobId={tab.jobId} data={tab.data} />
+                    </Await>
+                  )}
+                </TabPanel>
+              ))}
+            </Suspense>
           </Box>
         </Box>
       </Container>
@@ -146,7 +152,7 @@ export async function jobDetailLoader({ params }) {
   const jobDetail = jobDetailData.data;
   console.log(`Loaded job detail: ${JSON.stringify(jobDetail)}`);
 
-  // get job results
+  // Get job results
   console.log('Loading job result...');
   const jobResultResponse = await getJobResult(jobId);
 

@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
-import { Link as RouterLink, json, useLoaderData } from 'react-router-dom';
+import { useState, Suspense } from 'react';
+import { Link as RouterLink, json, useLoaderData, Await } from 'react-router-dom';
 
 // @mui
 import {
@@ -177,42 +177,46 @@ export default function JobLogPage() {
                   onSelectAllClick={() => console.log('Call handleAllSelectClick!')}
                 />
                 <TableBody>
-                  {jobList.map((row, index) => {
-                    const no = page * rowsPerPage + index + 1;
-                    const { username: studentId, _id: jobId, termId } = row;
-                    const selectedJobLog = selected.indexOf(studentId) !== -1;
+                  <Suspense fallback={<p style={{ textAlign: 'center' }}>Loading...</p>}>
+                    <Await resolve={jobList}>
+                      {jobList.map((row, index) => {
+                        const no = page * rowsPerPage + index + 1;
+                        const { username: studentId, _id: jobId, termId } = row;
+                        const selectedJobLog = selected.indexOf(studentId) !== -1;
 
-                    return (
-                      <TableRow hover key={jobId} tabIndex={-1} role="checkbox" selected={selectedJobLog}>
-                        <TableCell align="left">{no}</TableCell>
+                        return (
+                          <TableRow hover key={jobId} tabIndex={-1} role="checkbox" selected={selectedJobLog}>
+                            <TableCell align="left">{no}</TableCell>
 
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" marginLeft={2} spacing={2}>
-                            <Typography variant="subtitle2" noWrap>
-                              {studentId}
-                            </Typography>
-                          </Stack>
-                        </TableCell>
+                            <TableCell component="th" scope="row" padding="none">
+                              <Stack direction="row" alignItems="center" marginLeft={2} spacing={2}>
+                                <Typography variant="subtitle2" noWrap>
+                                  {studentId}
+                                </Typography>
+                              </Stack>
+                            </TableCell>
 
-                        <TableCell align="left">{termId}</TableCell>
+                            <TableCell align="left">{termId}</TableCell>
 
-                        <TableCell align="left">{jobId}</TableCell>
+                            <TableCell align="left">{jobId}</TableCell>
 
-                        <TableCell align="left">
-                          <Link
-                            component={RouterLink}
-                            to={`/dashboard/joblog/${jobId}/details`}
-                            variant="subtitle2"
-                            underline="hover"
-                          >
-                            <IconButton size="large" color="inherit">
-                              <Iconify icon={'fluent:open-16-filled'} />
-                            </IconButton>
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                            <TableCell align="left">
+                              <Link
+                                component={RouterLink}
+                                to={`/dashboard/joblog/${jobId}/details`}
+                                variant="subtitle2"
+                                underline="hover"
+                              >
+                                <IconButton size="large" color="inherit">
+                                  <Iconify icon={'fluent:open-16-filled'} />
+                                </IconButton>
+                              </Link>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </Await>
+                  </Suspense>
                 </TableBody>
 
                 {isNotFound && (

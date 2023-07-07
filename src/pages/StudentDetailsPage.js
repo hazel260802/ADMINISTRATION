@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
-import {useLoaderData} from 'react-router-dom';
-import { useState } from 'react';
+import { useLoaderData, Await } from 'react-router-dom';
+import { useState, Suspense } from 'react';
 import PropTypes from 'prop-types';
 // @mui
 import {
@@ -86,12 +86,13 @@ export default function StudentDetailsPage() {
           >
             <Tabs
               value={value}
-              onChange={(event, newValue) => handleChange(newValue)}
+              onChange={(newValue) => handleChange(newValue)}
               variant="scrollable"
               scrollButtons
               allowScrollButtonsMobile
               aria-label="scrollable force tabs example"
             >
+                         
               {tabs.map((tab) => (
                 <LinkTab key={tab.id} label={tab.label} value={tab.id} />
               ))}
@@ -103,12 +104,17 @@ export default function StudentDetailsPage() {
               mt: 3,
             }}
           >
+           <Suspense fallback={<p style={{ textAlign: 'center' }}>Loading...</p>}>  
             {tabs.map((tab) => (
               <TabPanel key={tab.id} value={value} index={tab.id}>
-                {value === tab.id && <tab.component data={tab.data} />}
-              </TabPanel>
-            ))}
-
+                {value === tab.id && (
+                    <Await resolve={studentInfo&&studentLanguage&&studentSubject&&studentSemester}>
+                      <tab.component data={tab.data} />
+                    </Await>
+                  )}
+                </TabPanel>
+              ))}
+            </Suspense>
             </Box>
         </Box>
       </Container>

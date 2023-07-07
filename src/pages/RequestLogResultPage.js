@@ -28,7 +28,6 @@ import { getRequestLogs } from '../services/requestlog';
 
 const TABLE_HEAD = [
   { id: 'no', label: 'No', alignRight: false },
-  { id: 'username', label: 'Username', alignRight: false },
   { id: 'method', label: 'Method', alignRight: false },
   { id: 'url', label: 'URL', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
@@ -46,7 +45,7 @@ export default function RequestLogPage() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
-  const [orderBy, setOrderBy] = useState('username');
+  const [orderBy, setOrderBy] = useState('');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -58,9 +57,8 @@ export default function RequestLogPage() {
   const noData = !requestList.length && !filterName;
 
   // Update current request job list
-  const updateRequestList = async ({ username, page, size }) => {
+  const updateRequestList = async ({ page, size }) => {
     const response = await getRequestLogs({
-      username,
       page,
       size,
     });
@@ -97,7 +95,7 @@ export default function RequestLogPage() {
     console.log(`Jump to page ${newPage}`);
 
     // Reset data
-    await updateRequestList({ username: filterName, page: newPage + 1, size: rowsPerPage });
+    await updateRequestList({ page: newPage + 1, size: rowsPerPage });
 
     // Change page
     setPage(newPage);
@@ -109,7 +107,7 @@ export default function RequestLogPage() {
     const newRowPerPage = parseInt(event.target.value, 10);
 
     // Reset data
-    await updateRequestList({ username: filterName, page: 1, size: newRowPerPage });
+    await updateRequestList({ page: 1, size: newRowPerPage });
 
     // Back to page 1
     setPage(0);
@@ -122,7 +120,7 @@ export default function RequestLogPage() {
       console.log(`Enter pressed. Search for ${filterName}!`);
 
       // Update job list
-      await updateRequestList({ username: filterName, page: 1, size: rowsPerPage });
+      await updateRequestList({ page: 1, size: rowsPerPage });
 
       // Back to page 1
       setPage(0);
@@ -179,22 +177,20 @@ export default function RequestLogPage() {
                     <Await resolve={requestList}>
                       {requestList.map((row, index) => {
                         const no = page * rowsPerPage + index + 1;
-                        const { username, method, url, status, timestamp, responseTime, responseTimeUnit } = row;
-                        const selectedRequestLog = selected.indexOf(username) !== -1;
+                        const { method, url, status, timestamp, responseTime, responseTimeUnit } = row;
+                        const selectedRequestLog = selected.indexOf(timestamp) !== -1;
 
                         return (
-                          <TableRow hover key={username} tabIndex={-1} role="checkbox" selected={selectedRequestLog}>
+                          <TableRow hover key={timestamp} tabIndex={-1} role="checkbox" selected={selectedRequestLog}>
                             <TableCell align="left">{no}</TableCell>
 
                             <TableCell component="th" scope="row" padding="none">
                               <Stack direction="row" alignItems="center" marginLeft={2} spacing={2}>
                                 <Typography variant="subtitle2" noWrap>
-                                  {username}
+                                  {method}
                                 </Typography>
                               </Stack>
                             </TableCell>
-
-                            <TableCell align="center">{method}</TableCell>
 
                             <TableCell align="left">{url}</TableCell>
 
@@ -278,7 +274,6 @@ export default function RequestLogPage() {
 }
 async function loadRequestLogs() {
   const response = await getRequestLogs({
-    username: '',
     page: 1,
     size: 5,
   });
