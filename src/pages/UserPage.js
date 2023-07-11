@@ -60,10 +60,6 @@ export default function UserPage() {
   const [studentQuantity, setStudentQuantity] = useState(quantity);
   const [currentSchool, setCurrentSchool] = useState('');
 
-  // Params
-  const isNotFound = !studentFilterList?.length && !!filterStudentId && !!filterCohort;
-  const noData = !studentFilterList?.length && !filterStudentId && !!filterCohort;
-
   // Update current student list
   const updateStudentList = async ({ studentId, school, cohort, page, size }) => {
     const response = await getStudents({ studentId, school, cohort, page, size });
@@ -194,7 +190,7 @@ export default function UserPage() {
             Settings
           </Button>
         </Stack>
-        
+
         <Card>
           <UserListToolbar
             currentSchool={currentSchool}
@@ -225,7 +221,7 @@ export default function UserPage() {
                 />
                 <TableBody>
                   <Suspense fallback={<p style={{ textAlign: 'center' }}>Loading...</p>}>
-                    <Await resolve={studentFilterList&&studentQuantity}>
+                    <Await resolve={studentFilterList && studentQuantity}>
                       {studentFilterList.map((row, index) => {
                         const no = page * rowsPerPage + index + 1;
                         const { name, studentId, cohort, school } = row;
@@ -268,7 +264,7 @@ export default function UserPage() {
                   </Suspense>
                 </TableBody>
 
-                {isNotFound && (
+                {(!studentFilterList.length && !!filterStudentId) && (
                   <TableBody>
                     <TableRow>
                       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
@@ -291,7 +287,7 @@ export default function UserPage() {
                     </TableRow>
                   </TableBody>
                 )}
-                {noData && (
+                {(!studentFilterList?.length && !!filterCohort) && (
                   <TableBody>
                     <TableRow>
                       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
