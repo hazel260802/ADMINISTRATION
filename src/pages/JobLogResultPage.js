@@ -62,9 +62,6 @@ export default function JobLogPage() {
   const [semesterList] = useState(loadedSemesterList);
   const [currentSemester, setCurrentSemester] = useState(semesterList.length > 0 ? semesterList[0] : 'None');
 
-  // Params
-  const isNotFound = !jobList.length && !!filterName;
-  const noData = !jobList.length && !filterName;
 
   // Update current job list
   const updateJobList = async (studentId, termId, page, size) => {
@@ -219,7 +216,7 @@ export default function JobLogPage() {
                   </Suspense>
                 </TableBody>
 
-                {isNotFound && (
+                {(!jobList?.length && !!filterName) && (
                   <TableBody>
                     <TableRow>
                       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
@@ -243,7 +240,7 @@ export default function JobLogPage() {
                   </TableBody>
                 )}
 
-                {noData && (
+                {(!jobList?.length && !currentSemester) && (
                   <TableBody>
                     <TableRow>
                       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>

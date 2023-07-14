@@ -20,7 +20,7 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 // components
 import Scrollbar from '../components/scrollbar';
 // sections
-import { RequestLogListHead, RequestLogListToolbar } from '../sections/@dashboard/requestlog';
+import { RequestLogListHead } from '../sections/@dashboard/requestlog';
 // service
 import { getRequestLogs } from '../services/requestlog';
 
@@ -46,15 +46,11 @@ export default function RequestLogPage() {
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
   const [orderBy, setOrderBy] = useState('');
-  const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   // Custom states
   const [requestList, setRequestList] = useState(requestLogs);
   const [requestQuantity, setRequestQuantity] = useState(quantity);
-  // Params
-  const isNotFound = !requestList.length && !!filterName;
-  const noData = !requestList.length && !filterName;
 
   // Update current request job list
   const updateRequestList = async ({ page, size }) => {
@@ -99,7 +95,6 @@ export default function RequestLogPage() {
 
     // Change page
     setPage(newPage);
-    setFilterName('');
   };
 
   // Change row per page
@@ -112,19 +107,6 @@ export default function RequestLogPage() {
     // Back to page 1
     setPage(0);
     setRowsPerPage(newRowPerPage);
-    setFilterName('');
-  };
-
-  const handleSearchSubmit = async (event) => {
-    if (event.key === 'Enter') {
-      console.log(`Enter pressed. Search for ${filterName}!`);
-
-      // Update job list
-      await updateRequestList({ page: 1, size: rowsPerPage });
-
-      // Back to page 1
-      setPage(0);
-    }
   };
 
   return (
@@ -151,14 +133,6 @@ export default function RequestLogPage() {
         </Stack>
 
         <Card>
-          <RequestLogListToolbar
-            numSelected={selected.length}
-            filterName={filterName}
-            onFilterName={(event) => {
-              setFilterName(event.target.value);
-            }}
-            onSubmit={handleSearchSubmit}
-          />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -208,30 +182,7 @@ export default function RequestLogPage() {
                   </Suspense>
                 </TableBody>
 
-                {isNotFound && (
-                  <TableBody>
-                    <TableRow>
-                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                        <Paper
-                          sx={{
-                            textAlign: 'center',
-                          }}
-                        >
-                          <Typography variant="h6" paragraph>
-                            Not found
-                          </Typography>
-
-                          <Typography variant="body2">
-                            No results found for &nbsp;
-                            <strong>&quot;{filterName}&quot;</strong>.
-                            <br /> Try checking for typos or using complete words.
-                          </Typography>
-                        </Paper>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                )}
-                {noData && (
+                {!requestList?.length && (
                   <TableBody>
                     <TableRow>
                       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
@@ -244,11 +195,6 @@ export default function RequestLogPage() {
                             Data does not exist!
                           </Typography>
 
-                          <Typography variant="body2">
-                            No results found for username &nbsp;
-                            <strong>&quot;{filterName}&quot;</strong>.
-                            <br /> Try other username instead.
-                          </Typography>
                         </Paper>
                       </TableCell>
                     </TableRow>
