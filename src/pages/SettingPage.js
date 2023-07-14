@@ -28,8 +28,8 @@ export default function SettingPage() {
     const settings = {
       crawl_cycle: form.elements.crawl_cycle.value + form.elements.crawl_cycle_unit.value,
       dkhptd_cycle: form.elements.dkhptd_cycle.value + form.elements.dkhptd_cycle_unit.value,
-      from: new Date(form.elements.from.value).getTime() / 1000,
-      to: new Date(form.elements.to.value).getTime() / 1000,
+      from: new Date(form.elements.from.value).getTime(),
+      to: new Date(form.elements.to.value).getTime(),
     };
 
     submit(settings, { method: 'post', action: '/dashboard/settings/job-cycle' });
@@ -133,14 +133,14 @@ export default function SettingPage() {
                   <input
                     name="from"
                     type="text"
-                    value={selectedFromDate ? selectedFromDate.toString() : new Date(loadedSettings.from * 1000)}
-                    // defaultValue={dayjs(new Date(loadedSettings.from * 1000))}
+                    value={selectedFromDate ? selectedFromDate.toString() : new Date(loadedSettings.from)}
+                    // defaultValue={dayjs(new Date(loadedSettings.from))}
                     style={{ display: 'none' }}
                     readOnly
                   />
                   <DateTimePicker
                     fullWidth
-                    defaultValue={dayjs(new Date(loadedSettings.from * 1000))}
+                    defaultValue={dayjs(new Date(loadedSettings.from))}
                     // value={selectedFromDate}
                     onChange={handleFromChange}
                   />
@@ -154,14 +154,14 @@ export default function SettingPage() {
                   <input
                     name="to"
                     type="text"
-                    value={selectedToDate ? selectedToDate.toString() : new Date(loadedSettings.to * 1000)}
+                    value={selectedToDate ? selectedToDate.toString() : new Date(loadedSettings.to)}
                     style={{ display: 'none' }}
-                    // defaultValue={dayjs(new Date(loadedSettings.to * 1000))}
+                    // defaultValue={dayjs(new Date(loadedSettings.to))}
                     readOnly
                   />
                   <DateTimePicker
                     fullWidth
-                    defaultValue={dayjs(new Date(loadedSettings.to * 1000))}
+                    defaultValue={dayjs(new Date(loadedSettings.to))}
                     // value={selectedToDate}
                     onChange={handleToChange}
                   />
